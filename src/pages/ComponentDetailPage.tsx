@@ -35,16 +35,16 @@ const ComponentDetailPage: FC = () => {
           <p className="description-text">{component.longDescription}</p>
         </div>
         <div className="image-holder">
-          <img src={component.imageUrl || '/images/placeholder_341x341.png'} alt="icon" />
+          <img src={component.imageUrl || '/placeholder_142x142.png'} alt="icon" />
           <div className="time-holder">
             <div className="time-component">
-              <img src="/images/placeholder_55x55.png" alt="ping icon" />
+              <img src="/ping_icon.svg" alt="ping icon" />
               <span>{component.time} мс</span>
             </div>
           </div>
         </div>
       </div>
-      {/* Checkbox группа, но методичка для гостя, так что опционально */}
+      {/* Checkbox группа, но не для гостя */}
       <div className="add-to-cart">
         {/* Form с checkbox, но mock */}
       </div>

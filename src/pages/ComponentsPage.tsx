@@ -40,7 +40,7 @@ const ComponentsListPage: FC = () => {
               onChange={(e) => setInputValue(e.target.value)}
             />
             <button type="submit" className="search-button">
-              <img src="/placeholder_29x29.png" alt="search" />
+              <img src="/search_icon.svg" alt="search" />
             </button>
           </form>
         </div>
