@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';  // Добавлен для Link на корзину
 import Breadcrumbs from '../components/Breadcrumbs';
 import CardComponent from '../components/CardComponent';
 import { getComponents } from '../modules/api';
@@ -25,6 +26,10 @@ const ComponentsListPage: FC = () => {
     e.preventDefault();
     setAppliedFilter(inputValue);
   };
+
+  // Захардкоженые значения
+  const draftTimePingId = 1;  // ID для ссылки
+  const requestSize = 3;  //  кол-во элементов
 
   return (
     <div className="page-wrapper">
@@ -55,6 +60,12 @@ const ComponentsListPage: FC = () => {
         </div>
       </div>
       <div className="footer">Reduct0r 2025</div>
+      {draftTimePingId !== null && requestSize > 0 && (
+        <div className="request-icon">
+          <img src="/cart.png" alt="Корзина" onError={(e) => { e.currentTarget.src = '/placeholder_85x89.png'; }} />
+          <span className="request-badge">{requestSize}</span>
+        </div>
+      )}
     </div>
   );
 };
