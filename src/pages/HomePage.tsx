@@ -1,7 +1,7 @@
 import type { FC } from 'react';
-import { Link } from 'react-router-dom';  // Добавлен импорт для Link
+import { Link } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
-import { ROUTES } from '../Routes';  // Импорт ROUTES для пути
+import { ROUTES } from '../Routes';
 import '../styles/styles.css';
 
 const HomePage: FC = () => {
