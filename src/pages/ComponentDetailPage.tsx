@@ -27,13 +27,12 @@ const ComponentDetailPage: FC = () => {
 
   return (
     <div className="page-wrapper">
-      <div className="header-main"> {/* Navbar в App */} </div>
       <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.COMPONENTS, path: ROUTES.COMPONENTS }, { label: component.title }]} />
       <div className="info-board">
         <div className="text-block">
           <p className="title">{component.title}</p>
           <p className="short-description">{component.description}</p>
-          <p className="description">{component.longDescription}</p>
+          <p className="description-text">{component.longDescription}</p>
         </div>
         <div className="image-holder">
           <img src={component.imageUrl || '/images/placeholder_341x341.png'} alt="icon" />

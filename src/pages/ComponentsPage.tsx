@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { useState, useEffect } from 'react';
-import { Row, Col, Form, Button } from 'react-bootstrap';
 import Breadcrumbs from '../components/Breadcrumbs';
 import CardComponent from '../components/CardComponent';
 import { getComponents } from '../modules/api';
@@ -9,50 +8,50 @@ import '../styles/styles.css';
 import type { Component } from '../modules/mock';
 
 const ComponentsListPage: FC = () => {
-  const [filter, setFilter] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const [appliedFilter, setAppliedFilter] = useState('');
   const [components, setComponents] = useState<Component[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    getComponents(filter).then((data) => {
+    getComponents(appliedFilter).then((data) => {
       setComponents(data);
       setLoading(false);
     });
-  }, [filter]);
+  }, [appliedFilter]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Фильтр в useEffect
+    setAppliedFilter(inputValue);
   };
 
   return (
     <div className="page-wrapper">
-      <div className="header-main"> {/* Navbar в App */} </div>
       <div className="main-plate">
         <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.COMPONENTS }]} />
         <div className="welcome-title">Компоненты</div>
         <div className="search-holder">
-          <Form className="search-bar" onSubmit={handleSearch}>
+          <form className="search-bar" onSubmit={handleSearch}>
             <input
               type="text"
               placeholder="Поиск серверных компонентов"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
             />
-            <Button type="submit" className="search-button">
-              <img src="/images/placeholder_29x29.png" alt="search" />
-            </Button>
-          </Form>
+            <button type="submit" className="search-button">
+              <img src="/placeholder_29x29.png" alt="search" />
+            </button>
+          </form>
         </div>
         <div className="container-plate">
-          <Row className="main-cards-container">
+          <div className="main-cards-container">
             {loading ? <p>Загрузка...</p> : components.map((comp) => (
-              <Col key={comp.id}>
+              <div key={comp.id} style={{ flex: '0 0 300px', margin: '0 auto' }}>
                 <CardComponent component={comp} />
-              </Col>
+              </div>
             ))}
-          </Row>
+          </div>
         </div>
       </div>
       <div className="footer">Reduct0r 2025</div>

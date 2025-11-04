@@ -11,7 +11,7 @@ const App: FC = () => {
     <BrowserRouter>
       <div className="header-main" style={{ display: 'flex', alignItems: 'center', padding: '0 40px' }}>
         <Link to={ROUTES.HOME} className="logo-group" style={{ paddingTop: 0, paddingLeft: 0 }}>
-          <img src="/icon.png" alt="icon" onError={(e) => { e.currentTarget.src = '/images/icon.png'; }} />
+          <img src="/icon.png" alt="icon" onError={(e) => { e.currentTarget.src = '/icon.png'; }} />
           <span className="logo-title">PINGTEST</span>
         </Link>
         <Link to={ROUTES.HOME} style={{ color: '#ffffff', textDecoration: 'none', transition: 'color 0.3s ease', marginLeft: '20px' }} onMouseOver={(e) => e.currentTarget.style.color = '#1CBFFF'} onMouseOut={(e) => e.currentTarget.style.color = '#ffffff'}>

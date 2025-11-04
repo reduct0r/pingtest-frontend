@@ -10,18 +10,18 @@ interface Props {
 const CardComponent: FC<Props> = ({ component }) => {
   return (
     <div className="card-container">
-      <Link to={`/components/${component.id}`} className="card-link">
-        <div className="card-content-container">
+      <Link to={`/components/${component.id}`} className="card-link" style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div className="card-content-container" style={{ maxWidth: '298px', boxSizing: 'border-box' }}>
           <img
-            src={component.imageUrl || '/images/placeholder_142x142.png'}
+            src={component.imageUrl || '/placeholder_142x142.png'}
             alt="placeholder"
             className="card-content-container-img"
-            onError={(e) => { e.currentTarget.src = '/images/placeholder_142x142.png'; }}
+            onError={(e) => { e.currentTarget.src = '/placeholder_142x142.png'; }}
           />
           <p className="card-title">{component.title}</p>
           <p className="description">{component.description}</p>
           <div className="time">
-            <img src="/images/placeholder_23x23.png" alt="ping icon" onError={(e) => { e.currentTarget.src = '/images/placeholder_23x23.png'; }} />  {}
+            <img src="ping_icon.svg" alt="ping icon" onError={(e) => { e.currentTarget.src = '/placeholder_23x23.png'; }} />
             <span>{component.time} мс</span>
             {/* <AddButton componentId={component.id} /> */}
           </div>
