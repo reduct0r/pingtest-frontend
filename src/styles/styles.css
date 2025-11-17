@@ -39,6 +39,8 @@
     flex-direction: column;
     gap: 26px;
     align-items: center;
+    max-width: 298px;
+    box-sizing: border-box;
 }
 
 .card-content-container-img {
@@ -130,14 +132,17 @@
     height: 80px;
     background-color: #1A1B2E;
     border-bottom: 2px solid #141424;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
 }
 
 .logo-group {
     display: flex;
     flex-direction: row;
     gap: 7px;
-    padding-top: 25px;
-    padding-left: 40px;
+    padding-top: 0;
+    padding-left: 0;
     background-color: transparent;
     cursor: pointer;
     width: fit-content;
@@ -150,7 +155,6 @@
     font-weight: 600;
     font-size: 24px;
 }
-
 
 .main-plate {
     background-color: #1A1B2E;
@@ -220,7 +224,7 @@
     gap: 82px;
     padding: 80px;
     justify-content: left;
-    max-width: 1300px; /* 3*300 + 2*82 + some padding adjustment = 900 + 164 = 1064, plus 82 for symmetry if needed, but set to fit 3 */
+    max-width: 1300px;
     margin: 0 auto;
 }
 
@@ -384,5 +388,149 @@
   }
   100% {
     transform: translateX(-50%);
+  }
+}
+
+.card-link {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.component-nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  margin-left: 20px;
+}
+
+.component-nav-link:hover {
+  color: #1CBFFF;
+}
+
+.main-cards-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 колонки на десктопе */
+  gap: 82px;
+  padding: 80px;
+  justify-items: center;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .main-cards-container {
+    grid-template-columns: repeat(2, 1fr); /* 2 колонки */
+    gap: 50px;
+    padding: 50px;
+  }
+
+  .card-container {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-cards-container {
+    grid-template-columns: 1fr; /* 1 колонка */
+    gap: 30px;
+    padding: 30px;
+  }
+
+  .card-container {
+    width: 100%;
+  }
+
+  .search-bar {
+    width: 90%;
+    margin: 20px auto 0;
+  }
+
+  .search-bar input {
+    font-size: 20px;
+    height: 45px;
+  }
+
+  .search-button {
+    width: 60px;
+    height: 45px;
+  }
+
+  .home-content {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    margin: 10px;
+  }
+
+  .left-column, .right-image {
+    flex: auto;
+  }
+
+  .section-title {
+    font-size: 24px;
+  }
+
+  .section-text, .services-list {
+    font-size: 14px;
+  }
+
+  .ticker-image {
+    height: 80px;
+  }
+}
+
+@media (max-width: 545px) {
+  .header-main {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    height: auto;
+  }
+
+  .logo-group {
+    padding-left: 0;
+    padding-top: 10px;
+  }
+
+  .logo-title {
+    font-size: 20px;
+  }
+
+  .component-nav-link {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .welcome-title {
+    font-size: 24px;
+    padding-left: 0;
+    text-align: center;
+  }
+
+  .card-title {
+    font-size: 20px;
+  }
+
+  .description {
+    font-size: 14px;
+  }
+
+  .time {
+    font-size: 18px;
+  }
+
+  .request-icon {
+    bottom: 20px;
+    right: 10px;
+  }
+
+  .request-badge {
+    top: 5px;
+    right: 30px;
+    padding: 1px 6px;
+    font-size: 14px;
   }
 }

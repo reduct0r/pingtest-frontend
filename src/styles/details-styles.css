@@ -198,3 +198,92 @@
     border-color: #881af0;
     transform: scale(1.05);
 }
+
+@media (max-width: 1200px) {
+  .info-board {
+    flex-direction: column;
+    height: auto;
+    align-items: center;
+  }
+
+  .text-block {
+    margin-left: 0;
+    text-align: center;
+    min-width: auto;
+  }
+
+  .image-holder {
+    margin-left: 0;
+    margin-top: 20px;
+  }
+
+  .info-board img {
+    height: 250px;
+    width: 250px;
+    margin-top: 20px;
+  }
+
+  .title {
+    font-size: 24px;
+    margin-top: 20px;
+  }
+
+  .short-description, .description-text {
+    max-width: 90%;
+    min-width: auto;
+  }
+
+  .add-to-cart {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .info-board {
+    padding: 20px;
+  }
+
+  .time-component {
+    font-size: 28px;
+  }
+
+  .time-component img {
+    height: 40px;
+    width: 40px;
+  }
+
+  .checkbox-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .add-to-cart button {
+    padding: 8px 20px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 545px) {
+  .header-main {
+    flex-direction: column;
+    height: auto;
+    padding: 10px;
+  }
+
+  .logo-group {
+    padding-left: 0;
+    justify-content: center;
+  }
+
+  .logo-title {
+    font-size: 20px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .short-description, .description-text {
+    font-size: 14px;
+  }
+}

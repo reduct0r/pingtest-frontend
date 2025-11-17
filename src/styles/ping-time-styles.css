@@ -206,6 +206,7 @@ body, html {
     background-color: transparent;
     cursor: pointer;
     width: fit-content;
+    text-decoration: none;
 }
 
 .logo-title {
@@ -417,4 +418,123 @@ body, html {
 
 .dark-input::placeholder {
     color: #9193A8;
+}
+
+@media (max-width: 1200px) {
+  .tile-container {
+    width: 100%;
+    height: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .title {
+    font-size: 22px;
+    flex: 1 1 100%;
+    text-align: center;
+  }
+
+  .description {
+    font-size: 12px;
+    min-width: auto;
+    flex: 1 1 100%;
+    text-align: center;
+  }
+
+  .mm-fields {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .result-holder, .container-plate {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .components-stack {
+    max-width: 90%;
+  }
+
+  .calculate-button {
+    margin-left: 0;
+    width: 150px;
+    height: 150px;
+    font-size: 50px;
+  }
+
+  .calculate-button::before {
+    width: 136px;
+    height: 136px;
+  }
+}
+
+@media (max-width: 768px) {
+  .tile-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .icon {
+    flex: 0 0 auto;
+  }
+
+  .time, .priority, .quantity {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .checkbox-label {
+    flex: 1 1 auto;
+  }
+
+  .welcome-title {
+    font-size: 20px;
+    text-align: center;
+    padding-left: 0;
+  }
+
+  .request-info {
+    flex-direction: column;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .load-level-selector {
+    flex-direction: column;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 545px) {
+  .header-main {
+    height: auto;
+    padding: 10px;
+  }
+
+  .logo-group {
+    padding-left: 0;
+    justify-content: center;
+  }
+
+  .logo-title {
+    font-size: 20px;
+  }
+
+  .result-title {
+    font-size: 24px;
+    text-align: center;
+  }
+
+  .dark-select, .dark-input {
+    width: 100%;
+  }
+
+  .mm-param {
+    font-size: 12px;
+  }
 }

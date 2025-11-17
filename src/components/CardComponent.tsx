@@ -10,8 +10,8 @@ interface Props {
 const CardComponent: FC<Props> = ({ component }) => {
   return (
     <div className="card-container">
-      <Link to={`/components/${component.id}`} className="card-link" style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <div className="card-content-container" style={{ maxWidth: '298px', boxSizing: 'border-box' }}>
+      <Link to={`/components/${component.id}`} className="card-link">
+        <div className="card-content-container">
           <img
             src={component.imageUrl || '/placeholder_142x142.png'}
             alt="placeholder"
