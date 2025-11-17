@@ -73,12 +73,10 @@ const ComponentsListPage: FC = () => {
         </div>
       </div>
       <div className="footer">Reduct0r 2025</div>
-      {draftId !== -1 && (
         <div className="request-icon">
           <img src="/cart.png" alt="Корзина" onError={(e) => { e.currentTarget.src = '/placeholder_85x89.png'; }} />
           {itemCount > 0 && <span className="request-badge">{itemCount}</span>}
         </div>
-      )}
     </div>
   );
 };
