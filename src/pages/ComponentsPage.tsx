@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';  // Добавлен для Link на корзину
 import Breadcrumbs from '../components/Breadcrumbs';
 import CardComponent from '../components/CardComponent';
 import { getComponents } from '../modules/api';
@@ -13,6 +12,8 @@ const ComponentsListPage: FC = () => {
   const [appliedFilter, setAppliedFilter] = useState('');
   const [components, setComponents] = useState<Component[]>([]);
   const [loading, setLoading] = useState(false);
+  const [draftId, setDraftId] = useState<number>(-1);
+  const [itemCount, setItemCount] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -22,14 +23,26 @@ const ComponentsListPage: FC = () => {
     });
   }, [appliedFilter]);
 
+  useEffect(() => {
+    fetch('/api/ping-time/cart-icon')
+      .then((response) => {
+        if (!response.ok) throw new Error('Network error');
+        return response.json();
+      })
+      .then((data) => {
+        setDraftId(data.draftId);
+        setItemCount(data.itemCount);
+      })
+      .catch(() => {
+        setDraftId(-1);
+        setItemCount(0);
+      });
+  }, []);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setAppliedFilter(inputValue);
   };
-
-  // Захардкоженые значения
-  const draftTimePingId = 1;  // ID для ссылки
-  const requestSize = 3;  //  кол-во элементов
 
   return (
     <div className="page-wrapper">
@@ -60,10 +73,10 @@ const ComponentsListPage: FC = () => {
         </div>
       </div>
       <div className="footer">Reduct0r 2025</div>
-      {draftTimePingId !== null && requestSize > 0 && (
+      {draftId !== -1 && (
         <div className="request-icon">
           <img src="/cart.png" alt="Корзина" onError={(e) => { e.currentTarget.src = '/placeholder_85x89.png'; }} />
-          <span className="request-badge">{requestSize}</span>
+          {itemCount > 0 && <span className="request-badge">{itemCount}</span>}
         </div>
       )}
     </div>

@@ -14,9 +14,6 @@ const App: FC = () => {
           <img src="/icon.png" alt="icon" onError={(e) => { e.currentTarget.src = '/icon.png'; }} />
           <span className="logo-title">PINGTEST</span>
         </Link>
-        <Link to={ROUTES.HOME} style={{ color: '#ffffff', textDecoration: 'none', transition: 'color 0.3s ease', marginLeft: '20px' }} onMouseOver={(e) => e.currentTarget.style.color = '#1CBFFF'} onMouseOut={(e) => e.currentTarget.style.color = '#ffffff'}>
-          {ROUTE_LABELS.HOME}
-        </Link>
         <Link to={ROUTES.COMPONENTS} style={{ color: '#ffffff', textDecoration: 'none', transition: 'color 0.3s ease', marginLeft: '20px' }} onMouseOver={(e) => e.currentTarget.style.color = '#1CBFFF'} onMouseOut={(e) => e.currentTarget.style.color = '#ffffff'}>
           {ROUTE_LABELS.COMPONENTS}
         </Link>
