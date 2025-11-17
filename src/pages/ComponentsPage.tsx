@@ -6,10 +6,14 @@ import { getComponents } from '../modules/api';
 import { ROUTE_LABELS } from '../Routes';
 import '../styles/styles.css';
 import type { Component } from '../modules/mock';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState } from '../store';
+import { setFilter } from '../slices/filterSlice';
 
 const ComponentsListPage: FC = () => {
-  const [inputValue, setInputValue] = useState('');
-  const [appliedFilter, setAppliedFilter] = useState('');
+  const dispatch = useDispatch();
+  const appliedFilter = useSelector((state: RootState) => state.filter.value);
+  const [inputValue, setInputValue] = useState(appliedFilter);
   const [components, setComponents] = useState<Component[]>([]);
   const [loading, setLoading] = useState(false);
   const [draftId, setDraftId] = useState<number>(-1);
@@ -41,7 +45,7 @@ const ComponentsListPage: FC = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setAppliedFilter(inputValue);
+    dispatch(setFilter(inputValue));
   };
 
   return (
@@ -73,10 +77,10 @@ const ComponentsListPage: FC = () => {
         </div>
       </div>
       <div className="footer">Reduct0r 2025</div>
-        <div className="request-icon">
-          <img src="/cart.png" alt="Корзина" onError={(e) => { e.currentTarget.src = '/placeholder_85x89.png'; }} />
-          {itemCount > 0 && <span className="request-badge">{itemCount}</span>}
-        </div>
+      <div className="request-icon">
+        <img src="/cart.png" alt="Корзина" onError={(e) => { e.currentTarget.src = '/placeholder_85x89.png'; }} />
+        {itemCount > 0 && <span className="request-badge">{itemCount}</span>}
+      </div>
     </div>
   );
 };
