@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 export default defineConfig({
-  base: '/pingtest-frontend/',
+  base: '/',
   server: {
     port: 3000,
     proxy: {
@@ -26,7 +26,10 @@ export default defineConfig({
     mkcert(),
     VitePWA({
       registerType: 'autoUpdate',
-      devOptions: { enabled: true },
+      devOptions: { enabled: false },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,png,svg,jpg,gif,ico}'],
+      },
       manifest: {
         name: 'PINGTEST',
         short_name: 'PINGTEST',

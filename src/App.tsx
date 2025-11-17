@@ -8,7 +8,7 @@ import './styles/styles.css';
 
 const App: FC = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/">
       <div className="header-main" style={{ display: 'flex', alignItems: 'center', padding: '0 40px' }}>
         <Link to={ROUTES.HOME} className="logo-group" style={{ paddingTop: 0, paddingLeft: 0 }}>
           <img src="/icon.png" alt="icon" onError={(e) => { e.currentTarget.src = '/icon.png'; }} />
