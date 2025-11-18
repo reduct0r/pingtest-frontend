@@ -4,12 +4,13 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import '../styles/styles.css';
 
 const HomePage: FC = () => {
+  const base = import.meta.env.BASE_URL;
   const images = [
-    '/line/balancer_line.png',
-    '/line/cache_line.png',
-    '/line/server_line.png',
-    '/line/server_settings.png',
-    '/line/speed_front.png',
+    `${base}line/balancer_line.png`,
+    `${base}line/cache_line.png`,
+    `${base}line/server_line.png`,
+    `${base}line/server_settings.png`,
+    `${base}line/speed_front.png`,
   ];
 
   const shuffledImages = useMemo(() => {
@@ -39,7 +40,7 @@ const HomePage: FC = () => {
           </div>
           <div className="right-image">
             <img 
-              src="/hero_image.png" 
+              src={`${base}hero_image.png`} 
               alt="PINGTEST Optimization" 
               className="hero-image"
             />
