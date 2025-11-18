@@ -7,11 +7,12 @@ import { ROUTES, ROUTE_LABELS } from './Routes';
 import './styles/styles.css';
 
 const App: FC = () => {
+  const base = import.meta.env.BASE_URL;
   return (
     <BrowserRouter basename="/">
       <div className="header-main" style={{ display: 'flex', alignItems: 'center', padding: '0 40px' }}>
         <Link to={ROUTES.HOME} className="logo-group" style={{ paddingTop: 0, paddingLeft: 0 }}>
-          <img src="/icon.png" alt="icon" onError={(e) => { e.currentTarget.src = '/icon.png'; }} />
+          <img src={`${base}icon.png`} alt="icon" onError={(e) => { e.currentTarget.src = `${base}icon.png`; }} />
           <span className="logo-title">PINGTEST</span>
         </Link>
         <Link to={ROUTES.COMPONENTS} style={{ color: '#ffffff', textDecoration: 'none', transition: 'color 0.3s ease', marginLeft: '20px' }} onMouseOver={(e) => e.currentTarget.style.color = '#1CBFFF'} onMouseOut={(e) => e.currentTarget.style.color = '#ffffff'}>

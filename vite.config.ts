@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 export default defineConfig({
-  base: '/',
+  base: '/pingtest-frontend/',
   server: {
     port: 3000,
     proxy: {
@@ -30,6 +30,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,jpg,gif,ico}'],
       },
+      manifestFilename: 'manifest.json',
       manifest: {
         name: 'PINGTEST',
         short_name: 'PINGTEST',

@@ -5,9 +5,10 @@ import Breadcrumbs from '../components/Breadcrumbs';
 import { getComponentById } from '../modules/api';
 import { ROUTES, ROUTE_LABELS } from '../Routes';
 import '../styles/details-styles.css';
-import type{ Component } from '../modules/mock';
+import type { Component } from '../modules/mock';
 
 const ComponentDetailPage: FC = () => {
+  const base = import.meta.env.BASE_URL;
   const { id } = useParams<{ id: string }>();
   const [component, setComponent] = useState<Component | null>(null);
   const [loading, setLoading] = useState(false);
@@ -35,10 +36,10 @@ const ComponentDetailPage: FC = () => {
           <p className="description-text">{component.longDescription}</p>
         </div>
         <div className="image-holder">
-          <img src={component.imageUrl || '/placeholder_142x142.png'} alt="icon" />
+          <img src={component.imageUrl || `${base}placeholder_142x142.png`} alt="icon" />
           <div className="time-holder">
             <div className="time-component">
-              <img src="/ping_icon.svg" alt="ping icon" />
+              <img src={`${base}ping_icon.svg`} alt="ping icon" />
               <span>{component.time} мс</span>
             </div>
           </div>

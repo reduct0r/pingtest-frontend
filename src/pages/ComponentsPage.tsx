@@ -11,12 +11,13 @@ import type { RootState } from '../store';
 import { setFilter } from '../slices/filterSlice';
 
 const ComponentsListPage: FC = () => {
+  const base = import.meta.env.BASE_URL;
   const dispatch = useDispatch();
   const appliedFilter = useSelector((state: RootState) => state.filter.value);
   const [inputValue, setInputValue] = useState(appliedFilter);
   const [components, setComponents] = useState<Component[]>([]);
   const [loading, setLoading] = useState(false);
-  const [draftId, setDraftId] = useState<number>(-1);
+  const [_ , setDraftId] = useState<number>(-1);
   const [itemCount, setItemCount] = useState(0);
 
   useEffect(() => {
@@ -62,7 +63,7 @@ const ComponentsListPage: FC = () => {
               onChange={(e) => setInputValue(e.target.value)}
             />
             <button type="submit" className="search-button">
-              <img src="/search_icon.svg" alt="search" />
+              <img src={`${base}search_icon.svg`} alt="search" />
             </button>
           </form>
         </div>
@@ -78,7 +79,7 @@ const ComponentsListPage: FC = () => {
       </div>
       <div className="footer">Reduct0r 2025</div>
       <div className="request-icon">
-        <img src="/cart.png" alt="Корзина" onError={(e) => { e.currentTarget.src = '/placeholder_85x89.png'; }} />
+        <img src={`${base}cart.png`} alt="Корзина" onError={(e) => { e.currentTarget.src = `${base}placeholder_85x89.png`; }} />
         {itemCount > 0 && <span className="request-badge">{itemCount}</span>}
       </div>
     </div>
