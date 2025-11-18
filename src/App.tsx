@@ -9,7 +9,7 @@ import './styles/styles.css';
 const App: FC = () => {
   const base = import.meta.env.BASE_URL;
   return (
-    <BrowserRouter basename="/">
+    <BrowserRouter basename="/pingtest-frontend"> 
       <div className="header-main" style={{ display: 'flex', alignItems: 'center', padding: '0 40px' }}>
         <Link to={ROUTES.HOME} className="logo-group" style={{ paddingTop: 0, paddingLeft: 0 }}>
           <img src={`${base}icon.png`} alt="icon" onError={(e) => { e.currentTarget.src = `${base}icon.png`; }} />
