@@ -8,6 +8,7 @@ import path from 'path';
 export default defineConfig({
   base: '/pingtest-frontend/',
   server: {
+    host: true,
     port: 3000,
     proxy: {
       '/api': {
