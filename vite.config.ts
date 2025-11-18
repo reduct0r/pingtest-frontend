@@ -8,7 +8,6 @@ import path from 'path';
 export default defineConfig(() => {
   const isTauri = process.env.TAURI_PLATFORM !== undefined;
   const base = isTauri ? './' : '/pingtest-frontend/';
-
   return {
     base,
     server: {
@@ -31,6 +30,7 @@ export default defineConfig(() => {
       mkcert(),
       VitePWA({
         registerType: 'autoUpdate',
+         injectRegister: isTauri ? null : 'auto',
         devOptions: { enabled: false },
         workbox: {
           globPatterns: ['**/*.{js,css,html,png,svg,jpg,gif,ico}'],
@@ -39,14 +39,14 @@ export default defineConfig(() => {
         manifest: {
           name: 'PINGTEST',
           short_name: 'PINGTEST',
-          start_url: '/',
+          start_url: isTauri ? '.' : '/',
           display: 'standalone',
           background_color: '#fdfdfd',
           theme_color: '#db4938',
           orientation: 'portrait-primary',
           icons: [
-            { src: '/logo192.png', type: 'image/png', sizes: '192x192' },
-            { src: '/logo512.png', type: 'image/png', sizes: '512x512' },
+            { src: 'logo192.png', type: 'image/png', sizes: '192x192' },
+            { src: 'logo512.png', type: 'image/png', sizes: '512x512' },
           ],
         },
       }),
