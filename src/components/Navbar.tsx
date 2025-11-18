@@ -12,7 +12,7 @@ const Navbar: FC = () => {
           alt="icon" 
           onError={(e) => { e.currentTarget.src = `${base}icon.png`; }}
         />
-        <span className="logo-title">PINGTEST</span>
+        <span className="logo-title">PINGTEST1</span>
       </Link>
       <nav style={{ display: 'inline-flex', gap: '20px', marginLeft: '20px' }}>  {}
         <Link to="/" style={{ color: '#ffffff', textDecoration: 'none', transition: 'color 0.3s ease' }} onMouseOver={(e) => e.currentTarget.style.color = '#1CBFFF'} onMouseOut={(e) => e.currentTarget.style.color = '#ffffff'}>

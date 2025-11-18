@@ -42,11 +42,3 @@ export const COMPONENTS_MOCK: Component[] = [
   }
 ];
 
-export const getMockComponents = (filter?: string): Component[] => {
-  if (!filter) return COMPONENTS_MOCK;
-  return COMPONENTS_MOCK.filter((comp) => comp.title.toLowerCase().includes(filter.toLowerCase()));
-};
-
-export const getMockComponentById = (id: number): Component | undefined => {
-  return COMPONENTS_MOCK.find((comp) => comp.id === id);
-};
