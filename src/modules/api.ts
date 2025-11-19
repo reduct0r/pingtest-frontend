@@ -1,4 +1,5 @@
 import { COMPONENTS_MOCK } from "./mock";
+import { isTauri } from '@tauri-apps/api/core';
 
 export interface Component {
   id: number;
@@ -9,7 +10,11 @@ export interface Component {
   imageUrl: string;
 }
 
-const API_BASE = '';
+let API_BASE = '';  // Для web/dev
+
+if (isTauri()) {  // Теперь без ошибки типов
+  API_BASE = 'http://192.168.15.7:8081';
+}
 
 export const getComponents = async (filter?: string, minTime?: number, maxTime?: number): Promise<Component[]> => {
   const params = new URLSearchParams();
