@@ -9,6 +9,7 @@ import type { Component } from '../modules/mock';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../store';
 import { setFilter } from '../slices/filterSlice';
+import { isTauri } from '@tauri-apps/api/core';
 
 const ComponentsListPage: FC = () => {
   const base = import.meta.env.BASE_URL;
@@ -29,7 +30,11 @@ const ComponentsListPage: FC = () => {
   }, [appliedFilter]);
 
   useEffect(() => {
-    fetch('/api/ping-time/cart-icon')
+      let cartUrl = '/api/ping-time/cart-icon';
+      if (isTauri()) {
+        cartUrl = 'http://192.168.15.7:8081/api/ping-time/cart-icon';
+    }
+    fetch(cartUrl)
       .then((response) => {
         if (!response.ok) throw new Error('Network error');
         return response.json();
