@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 export default defineConfig(() => {
-  const isTauri = process.env.TAURI_PLATFORM !== undefined;
+const isTauri = process.env.TAURI_ENV_PLATFORM !== undefined;
   const base = isTauri ? './' : '/pingtest-frontend/';
   return {
     base,
@@ -39,7 +39,8 @@ export default defineConfig(() => {
         manifest: {
           name: 'PINGTEST',
           short_name: 'PINGTEST',
-          start_url: isTauri ? '.' : '/',
+          start_url: isTauri ? '.' : base,
+          scope: base,
           display: 'standalone',
           background_color: '#fdfdfd',
           theme_color: '#db4938',

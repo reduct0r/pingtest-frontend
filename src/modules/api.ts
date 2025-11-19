@@ -9,7 +9,7 @@ export interface Component {
   imageUrl: string;
 }
 
-const API_BASE = 'http://192.168.15.7:8081';
+const API_BASE = '';
 
 export const getComponents = async (filter?: string, minTime?: number, maxTime?: number): Promise<Component[]> => {
   const params = new URLSearchParams();

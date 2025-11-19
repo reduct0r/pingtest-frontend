@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "devtools": true,
         "title": "pingtest-frontend",
         "width": 800,
         "height": 600,

@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter, Routes, Route, Link } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import ComponentsListPage from './pages/ComponentsPage';
 import ComponentDetailPage from './pages/ComponentDetailPage';
@@ -8,8 +8,9 @@ import './styles/styles.css';
 
 const App: FC = () => {
   const base = import.meta.env.BASE_URL;
+  //const basename = base.replace(/\/$/, '');
   return (
-    <BrowserRouter basename="/pingtest-frontend"> 
+    <HashRouter>
       <div className="header-main" style={{ display: 'flex', alignItems: 'center', padding: '0 40px' }}>
         <Link to={ROUTES.HOME} className="logo-group" style={{ paddingTop: 0, paddingLeft: 0 }}>
           <img src={`${base}icon.png`} alt="icon" onError={(e) => { e.currentTarget.src = `${base}icon.png`; }} />
@@ -24,7 +25,7 @@ const App: FC = () => {
         <Route path={ROUTES.COMPONENTS} element={<ComponentsListPage />} />
         <Route path={ROUTES.COMPONENT_DETAIL} element={<ComponentDetailPage />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
