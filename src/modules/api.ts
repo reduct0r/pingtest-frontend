@@ -27,8 +27,9 @@ export const getComponents = async (filter?: string, minTime?: number, maxTime?:
       if (!response.ok) throw new Error('Network error');
       return response.json();
     })
-    .catch(() => {
+    .catch((error) => {
       // Mock fallback
+      console.error('Fetch error:', error.message);
       return COMPONENTS_MOCK.filter(c => {
         const matchesFilter = filter ? c.title.toLowerCase().includes(filter.toLowerCase()) : true;
         const matchesMin = minTime ? c.time >= minTime : true;
