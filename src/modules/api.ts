@@ -10,9 +10,9 @@ export interface Component {
   imageUrl: string;
 }
 
-let API_BASE = '';  // Для web/dev
+let API_BASE = 'http://localhost:8081';
 
-if (isTauri()) {  // Теперь без ошибки типов
+if (isTauri()) {
   API_BASE = 'http://192.168.15.7:8081';
 }
 
