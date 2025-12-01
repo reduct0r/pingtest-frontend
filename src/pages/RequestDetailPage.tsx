@@ -102,104 +102,111 @@ const RequestDetailPage: FC = () => {
   };
 
   return (
-    <section className="request-details">
-      <header className="request-details__header">
-        <div>
-          <Link to={ROUTES.REQUESTS} className="ghost-button ghost-button--secondary">
-            ← Назад к списку
-          </Link>
-          <h1>Заявка #{currentRequest.id}</h1>
-          <p>Статус: {currentRequest.status}</p>
+    <div className="ping-wrapper">
+      <div className="ping-main-board">
+        <div className="ping-main-title">
+          <div className="logo-group logo-group--inline">
+            <img src={`${import.meta.env.BASE_URL}icon.png`} alt="PINGTEST" onError={(e) => (e.currentTarget.src = `${import.meta.env.BASE_URL}icon.png`)} />
+            <span className="logo-title">PINGTEST</span>
+          </div>
+          <button type="button" className="ghost-button ghost-button--secondary" onClick={() => navigate(ROUTES.REQUESTS)}>
+            ← Назад
+          </button>
         </div>
-        <div className="request-actions">
+
+        <div className="ping-info">
+          <div className="ping-info__row">
+            <p>
+              Номер: <span>{currentRequest.id}</span>
+            </p>
+            <p>
+              Статус: <span>{currentRequest.status}</span>
+            </p>
+          </div>
+          <div className="ping-info__row">
+            <label className="coefficient-label">
+              Коэф. нагрузки
+              <input
+                type="number"
+                className="mini-input"
+                value={coefficient}
+                min={1}
+                disabled={!isDraft}
+                onChange={(event) => setCoefficient(event.target.value === '' ? '' : Number(event.target.value))}
+              />
+            </label>
+            {isDraft && (
+              <button type="button" className="ghost-button" onClick={handleSaveCoefficient}>
+                Сохранить
+              </button>
+            )}
+            <div className="ping-totals">
+              <p>
+                Количество позиций: <strong>{currentRequest.items.reduce((acc, item) => acc + item.quantity, 0)}</strong>
+              </p>
+              <p>
+                Итоговое время: <strong>{currentRequest.totalTime ?? 0} мс</strong>
+              </p>
+            </div>
+          </div>
           {isDraft && (
-            <>
+            <div className="ping-actions">
               <button type="button" className="ghost-button" onClick={handleForm}>
-                Подтвердить
+                Сформировать заявку
               </button>
               <button type="button" className="ghost-button ghost-button--danger" onClick={handleDeleteRequest}>
                 Очистить черновик
               </button>
-            </>
-          )}
-        </div>
-      </header>
-
-      <div className="request-panel">
-        <div>
-          <label>
-            Коэффициент нагрузки
-            <input
-              type="number"
-              value={coefficient}
-              onChange={(event) => setCoefficient(event.target.value === '' ? '' : Number(event.target.value))}
-              disabled={!isDraft}
-              min={1}
-            />
-          </label>
-          {isDraft && (
-            <button type="button" className="ghost-button" onClick={handleSaveCoefficient}>
-              Сохранить коэффициент
-            </button>
-          )}
-        </div>
-        <div>
-          <strong>Всего компонентов: </strong>
-          {currentRequest.items.reduce((acc, item) => acc + item.quantity, 0)}
-        </div>
-        <div>
-          <strong>Итоговое время: </strong>
-          {currentRequest.totalTime ?? 0} мс
-        </div>
-      </div>
-
-      <div className="cards-wrapper-2">
-        {currentRequest.items.length === 0 ? (
-          <p>В заявке пока нет компонентов. Вернитесь на страницу услуг и нажмите кнопку «Добавить».</p>
-        ) : (
-          currentRequest.items.map((item) => (
-            <div className="fav-card" key={`${item.componentId}-${item.title}`}>
-              <div className="fav-card-body">
-                <div className="fav-card-header">
-                  <h3>{item.title}</h3>
-                  <span>{item.time} мс за единицу</span>
-                </div>
-                <p>{item.description}</p>
-                <div className="fav-card-controls">
-                  <label>
-                    Количество
-                    <input
-                      type="number"
-                      min={1}
-                      value={item.quantity}
-                      onChange={(event) => handleQuantityChange(item.componentId, Number(event.target.value))}
-                      disabled={!isDraft}
-                    />
-                  </label>
-                  <div>
-                    <strong>Итого:</strong> {item.subtotalTime} мс
-                  </div>
-                  {isDraft && (
-                    <button type="button" className="ghost-button ghost-button--danger" onClick={() => handleDeleteItem(item.componentId)}>
-                      Удалить
-                    </button>
-                  )}
-                </div>
-              </div>
             </div>
-          ))
-        )}
-      </div>
+          )}
+        </div>
 
-      <aside className="info-panel">
-        <h3>Работа с заявкой через Postman</h3>
-        <p>
-          После авторизации браузер сохраняет JWT в HttpOnly-cookie. Откройте вкладку <strong>Application → Cookies</strong> в DevTools, чтобы скопировать cookie
-          значения и использовать их как заголовок <code>Cookie</code> в Postman или Insomnia. В localStorage мы сохраняем только вспомогательные данные (например,
-          последний логин), поэтому безопасность учетных данных не нарушается.
-        </p>
-      </aside>
-    </section>
+        <div className="ping-components-stack">
+          {currentRequest.items.length === 0 ? (
+            <p className="ping-empty">В заявке пока нет компонентов. Вернитесь к каталогу и добавьте нужные позиции.</p>
+          ) : (
+            currentRequest.items.map((item) => (
+              <div className="tile-container" key={`${item.componentId}-${item.title}`}>
+                <img
+                  src={item.imageUrl || `${import.meta.env.BASE_URL}placeholder_142x142.png`}
+                  alt={item.title}
+                  className="icon"
+                  onError={(e) => (e.currentTarget.src = `${import.meta.env.BASE_URL}placeholder_142x142.png`)}
+                />
+                <div className="tile-content">
+                  <p className="title">{item.title}</p>
+                  <p className="description">{item.description}</p>
+                </div>
+                <div className="time">
+                  <img src={`${import.meta.env.BASE_URL}ping_icon.svg`} alt="ping" onError={(e) => (e.currentTarget.src = `${import.meta.env.BASE_URL}ping_icon.svg`)} />
+                  <span>{item.time} мс</span>
+                </div>
+                <div className="quantity">
+                  Кол-во
+                  <input
+                    type="number"
+                    className="mini-input"
+                    value={item.quantity}
+                    min={1}
+                    disabled={!isDraft}
+                    onChange={(event) => handleQuantityChange(item.componentId, Number(event.target.value))}
+                  />
+                </div>
+                <div className="priority">
+                  Итого
+                  <strong>{item.subtotalTime} мс</strong>
+                </div>
+                {isDraft && (
+                  <button type="button" className="tile-delete" onClick={() => handleDeleteItem(item.componentId)}>
+                    Удалить
+                  </button>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

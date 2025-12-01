@@ -268,6 +268,7 @@ body, html, #root {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  color: #ffffff;
 }
 
 .requests-header {
@@ -283,6 +284,19 @@ body, html, #root {
   border: 1px solid rgba(255, 255, 255, 0.16);
   color: #ffffff;
   padding: 8px 10px;
+  background-color: #05061F;
+}
+
+.requests-page table,
+.requests-page th,
+.requests-page td,
+.requests-page p,
+.requests-page h1 {
+  color: #ffffff;
+}
+
+.requests-page select option {
+  color: #000000;
 }
 
 .table-wrapper {
@@ -424,6 +438,180 @@ td {
   width: 90px;
 }
 
+.ping-wrapper {
+  min-height: 100vh;
+  background: #05061f;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 40px;
+}
+
+.ping-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ping-main-board {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 40px;
+  color: #ffffff;
+}
+
+.ping-main-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-group--inline {
+  padding: 0;
+}
+
+.ping-info {
+  background: rgba(5, 6, 31, 0.9);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ping-info__row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  color: #ffffff;
+}
+
+.ping-info__row p,
+.ping-info__row label {
+  color: #ffffff;
+}
+
+.ping-info__row p,
+.ping-info__row label {
+  color: #ffffff;
+}
+
+.ping-info__row span {
+  color: #1cbfff;
+}
+
+.coefficient-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ping-totals {
+  display: flex;
+  gap: 20px;
+  color: #ffffff;
+}
+
+.ping-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ping-components-stack {
+  background: rgba(5, 6, 31, 0.7);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ping-empty {
+  color: #9193a8;
+}
+
+.tile-container {
+  display: grid;
+  grid-template-columns: 120px 1fr 120px 120px 120px auto;
+  align-items: center;
+  gap: 15px;
+  padding: 12px;
+  border: 2px solid #1cbfff;
+  border-radius: 20px;
+  background: #1a1b2e;
+}
+
+.tile-container .icon {
+  width: 111px;
+  height: 111px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.tile-container .title {
+  color: #ffffff;
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.tile-container .description {
+  color: #9193a8;
+  font-size: 14px;
+  max-height: 72px;
+  overflow: hidden;
+}
+
+.tile-container .time {
+  color: #FFF38E;
+}
+
+.tile-container .priority {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #ffffff;
+}
+
+.tile-container .priority strong {
+  color: #FFF38E;
+}
+
+.tile-container .time {
+  color: #FFF38E;
+}
+
+.tile-container .priority {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #ffffff;
+}
+
+.tile-container .priority strong {
+  color: #FFF38E;
+}
+
+.tile-container .time img {
+  width: 32px;
+  height: 32px;
+}
+
+.tile-container .tile-delete {
+  border: none;
+  background: #b01515;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
 .card-container {
     display: flex;
     width: 300px;
@@ -503,6 +691,20 @@ td {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+
+.primary-button.add-inline {
+  padding: 8px 16px;
+  font-size: 14px;
+  line-height: 1;
 }
 
 .button-container {
@@ -659,10 +861,12 @@ td {
     position: fixed;
     bottom: 50px;
     right: -15px;
-    padding: 20px;
+    padding: 0;
     cursor: pointer;
     z-index: 1000;
     width: fit-content;
+    background: transparent;
+    border: none;
 }
 
 .request-icon img {
@@ -684,6 +888,20 @@ td {
     text-align: center;
     min-width: auto;
     transition: width 0.3s ease;
+}
+
+.request-icon--disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.mini-input {
+  background-color: #05061F;
+  color: #ffffff;
+  border: 1px solid #1CBFFF;
+  border-radius: 8px;
+  padding: 6px 10px;
+  width: 70px;
 }
 
 .custom-navbar {

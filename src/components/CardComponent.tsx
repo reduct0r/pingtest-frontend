@@ -26,21 +26,23 @@ const CardComponent: FC<Props> = ({ component, canAdd = false, onAdd, isAdding }
           />
           <p className="card-title">{component.title}</p>
           <p className="description">{component.description}</p>
-          <div className="time">
-            <img
-              src={`${base}ping_icon.svg`}
-              alt="ping icon"
-              onError={(e) => {
-                e.currentTarget.src = `${base}placeholder_23x23.png`;
-              }}
-            />
-            <span>{component.time} мс</span>
+          <div className="time-row">
+            <div className="time">
+              <img
+                src={`${base}ping_icon.svg`}
+                alt="ping icon"
+                onError={(e) => {
+                  e.currentTarget.src = `${base}placeholder_23x23.png`;
+                }}
+              />
+              <span>{component.time} мс</span>
+            </div>
+            {canAdd && component.id && (
+              <button type="button" className="primary-button primary-button--ghost add-inline" disabled={isAdding} onClick={() => onAdd?.(component.id!)}>
+                {isAdding ? '...' : 'Добавить'}
+              </button>
+            )}
           </div>
-          {canAdd && component.id && (
-            <button type="button" className="primary-button primary-button--ghost" disabled={isAdding} onClick={() => onAdd?.(component.id!)}>
-              {isAdding ? 'Добавляем...' : 'Добавить в заявку'}
-            </button>
-          )}
         </div>
       </Link>
     </div>
