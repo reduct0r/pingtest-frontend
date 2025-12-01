@@ -1,15 +1,77 @@
 import type { FC } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation, Link } from 'react-router-dom';
 import AppHeader from './AppHeader';
 import { useAppInfo } from '../context/AppInfoContext';
+import { ROUTES } from '../Routes';
+
+const breadcrumbMap: Record<string, string> = {
+  '': 'Главная',
+  components: 'Компоненты',
+  requests: 'Мои заявки',
+  profile: 'Личный кабинет',
+  login: 'Вход',
+  register: 'Регистрация',
+};
+
+const getStoredComponentTitle = (id: string) => {
+  if (typeof window === 'undefined') return null;
+  return sessionStorage.getItem(`componentTitle:${id}`);
+};
 
 const AppLayout: FC = () => {
   const { companyMotto } = useAppInfo();
+  const location = useLocation();
+
+  const buildBreadcrumbs = () => {
+    const cleaned = location.pathname.replace(/^\/+/, '');
+    if (!cleaned) {
+      return [];
+    }
+    const parts = cleaned.split('/');
+    const state = (location.state as { breadcrumb?: string } | undefined) ?? {};
+
+    return parts.map((part, index) => {
+      const path = `/${parts.slice(0, index + 1).join('/')}`;
+      const prev = parts[index - 1];
+      const isLast = index === parts.length - 1;
+      let label = breadcrumbMap[part] ?? decodeURIComponent(part);
+
+      if (/^\d+$/.test(part)) {
+        if (prev === 'requests') {
+          label = `Заявка ${part}`;
+        } else if (prev === 'components') {
+          if (isLast && state.breadcrumb) {
+            label = state.breadcrumb;
+          } else {
+            label = getStoredComponentTitle(part) ?? `Компонент ${part}`;
+          }
+        }
+      }
+
+      return { label, path, isLast };
+    });
+  };
+
+  const crumbs = buildBreadcrumbs();
 
   return (
     <div className="app-shell">
       <AppHeader />
       <main className="app-main">
+        <div className="breadcrumbs-wrapper">
+          <Link to={ROUTES.HOME}>Главная</Link>
+          {crumbs.map((crumb) => (
+            <span key={crumb.path}>
+              {' '}
+              /{' '}
+              {crumb.isLast ? (
+                <span>{crumb.label}</span>
+              ) : (
+                <Link to={crumb.path}>{crumb.label}</Link>
+              )}
+            </span>
+          ))}
+        </div>
         <Outlet />
       </main>
       <footer className="app-footer">

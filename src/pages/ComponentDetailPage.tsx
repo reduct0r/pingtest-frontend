@@ -1,8 +1,6 @@
 import type { FC } from 'react';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import Breadcrumbs from '../components/Breadcrumbs';
-import { ROUTES, ROUTE_LABELS } from '../Routes';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/details-styles.css';
 import type { ComponentDto } from '../api/Api';
 import { api } from '../api';
@@ -18,6 +16,8 @@ const ComponentDetailPage: FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { mutationLoading } = useAppSelector((state) => state.requests);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!id) {
@@ -30,12 +30,25 @@ const ComponentDetailPage: FC = () => {
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    if (!component) return;
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(`componentTitle:${component.id}`, component.title);
+    }
+    const currentState = (location.state as Record<string, unknown> | null) ?? {};
+    if (currentState.breadcrumb !== component.title) {
+      navigate('.', {
+        replace: true,
+        state: { ...currentState, breadcrumb: component.title },
+      });
+    }
+  }, [component, location.state, navigate]);
+
   if (loading) return <Loader label="Подгружаем компонент..." />;
   if (!component) return <p>Компонент не найден</p>;
 
   return (
     <div className="page-wrapper">
-      <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.COMPONENTS, path: ROUTES.COMPONENTS }, { label: component.title }]} />
       <div className="info-board">
         <div className="text-block">
           <p className="title">{component.title}</p>

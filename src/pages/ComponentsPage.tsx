@@ -1,8 +1,7 @@
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
-import Breadcrumbs from '../components/Breadcrumbs';
 import CardComponent from '../components/CardComponent';
-import { ROUTE_LABELS, ROUTES } from '../Routes';
+import { ROUTES } from '../Routes';
 import '../styles/styles.css';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchComponents, setSearchValue } from '../slices/catalogSlice';
@@ -40,7 +39,6 @@ const ComponentsListPage: FC = () => {
   return (
     <div className="page-wrapper">
       <div className="main-plate">
-        <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.COMPONENTS }]} />
         <div className="welcome-title">Компоненты</div>
         <div className="search-holder">
           <form className="search-bar" onSubmit={handleSearch}>
@@ -55,13 +53,13 @@ const ComponentsListPage: FC = () => {
           {loading ? (
             <Loader />
           ) : (
-            <div className="main-cards-container">
+          <div className="main-cards-container">
               {items.map((comp) => (
-                <div key={comp.id} style={{ flex: '0 0 300px', margin: '0 auto' }}>
+              <div key={comp.id} style={{ flex: '0 0 300px', margin: '0 auto' }}>
                   <CardComponent component={comp} canAdd={Boolean(user)} onAdd={handleAdd} isAdding={mutationLoading} />
-                </div>
-              ))}
-            </div>
+              </div>
+            ))}
+          </div>
           )}
         </div>
       </div>

@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { useMemo } from 'react';
-import Breadcrumbs from '../components/Breadcrumbs';
 import '../styles/styles.css';
 import { useAppInfo } from '../context/AppInfoContext';
 
@@ -23,7 +22,6 @@ const HomePage: FC = () => {
 
   return (
     <div className="page-wrapper">
-      <Breadcrumbs crumbs={[]} />
       <div className="main-plate">
         <div className="home-content">
           <div className="left-column">

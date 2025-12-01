@@ -21,6 +21,18 @@ body, html, #root {
 .app-main {
   flex: 1;
   padding: 20px 40px 60px;
+  background-color: #05061f;
+}
+
+.breadcrumbs-wrapper {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.breadcrumbs-wrapper a {
+  color: #1cbfff;
 }
 
 .app-footer {
@@ -539,7 +551,7 @@ td {
 
 .tile-container {
   display: grid;
-  grid-template-columns: 120px 1fr 120px 120px 120px auto;
+  grid-template-columns: 120px minmax(260px, 2fr) 140px 140px auto 110px;
   align-items: center;
   gap: 15px;
   padding: 12px;
@@ -561,6 +573,13 @@ td {
   margin-bottom: 4px;
 }
 
+.tile-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
 .tile-container .description {
   color: #9193a8;
   font-size: 14px;
@@ -570,6 +589,10 @@ td {
 
 .tile-container .time {
   color: #FFF38E;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: center;
 }
 
 .tile-container .priority {
@@ -577,25 +600,21 @@ td {
   flex-direction: column;
   gap: 4px;
   color: #ffffff;
+  align-self: center;
+  text-align: center;
 }
 
 .tile-container .priority strong {
   color: #FFF38E;
 }
 
-.tile-container .time {
-  color: #FFF38E;
-}
-
-.tile-container .priority {
+.tile-container .quantity {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
   color: #ffffff;
-}
-
-.tile-container .priority strong {
-  color: #FFF38E;
+  align-self: center;
 }
 
 .tile-container .time img {
@@ -642,6 +661,15 @@ td {
     align-items: center;
     max-width: 298px;
     box-sizing: border-box;
+}
+
+.card-body-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  width: 100%;
+  text-align: center;
 }
 
 .card-content-container-img {
@@ -773,7 +801,11 @@ td {
 
 .main-plate {
     background-color: #1A1B2E;
-    flex-grow: 1;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    padding: 20px 40px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
 }
 
 .welcome-title {
@@ -860,24 +892,25 @@ td {
 .request-icon {
     position: fixed;
     bottom: 50px;
-    right: -15px;
+    right: 30px;
     padding: 0;
     cursor: pointer;
     z-index: 1000;
-    width: fit-content;
+    width: 90px;
     background: transparent;
     border: none;
 }
 
 .request-icon img {
-    width: 80%;
+    width: 100%;
     height: auto;
+    display: block;
 }
 
 .request-badge {
     position: absolute;
-    top: 15px;
-    right: 45px;
+    top: 6px;
+    right: 6px;
     background-color: red;
     color: white;
     border-radius: 999px;
@@ -994,7 +1027,9 @@ td {
 }
 
 .ticker-container {
-  width: 100%;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
   overflow: hidden;
   background-color: #05061F;
   padding: 20px 0;
