@@ -2,19 +2,21 @@ import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 import Breadcrumbs from '../components/Breadcrumbs';
 import CardComponent from '../components/CardComponent';
-import { ROUTE_LABELS } from '../Routes';
+import { ROUTE_LABELS, ROUTES } from '../Routes';
 import '../styles/styles.css';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchComponents, setSearchValue } from '../slices/catalogSlice';
 import { addComponentToDraft } from '../slices/requestsSlice';
 import Loader from '../components/Loader';
+import { useNavigate } from 'react-router-dom';
 
 const ComponentsListPage: FC = () => {
   const base = import.meta.env.BASE_URL;
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { items, loading, error, searchValue } = useAppSelector((state) => state.catalog);
   const { user } = useAppSelector((state) => state.auth);
-  const { mutationLoading } = useAppSelector((state) => state.requests);
+  const { mutationLoading, cartInfo } = useAppSelector((state) => state.requests);
   const [inputValue, setInputValue] = useState(searchValue);
 
   useEffect(() => {
@@ -63,6 +65,17 @@ const ComponentsListPage: FC = () => {
           )}
         </div>
       </div>
+      {user && (
+        <button
+          type="button"
+          className={`request-icon ${!cartInfo?.draftId ? 'request-icon--disabled' : ''}`}
+          onClick={() => cartInfo?.draftId && navigate(`${ROUTES.REQUESTS}/${cartInfo.draftId}`)}
+          disabled={!cartInfo?.draftId}
+        >
+          <img src={`${base}cart.png`} alt="Корзина" onError={(e) => (e.currentTarget.src = `${base}placeholder_85x89.png`)} />
+          {cartInfo?.itemCount ? <span className="request-badge">{cartInfo.itemCount}</span> : null}
+        </button>
+      )}
     </div>
   );
 };

@@ -11,7 +11,6 @@ const AppHeader: FC = () => {
   const navigate = useNavigate();
   const base = import.meta.env.BASE_URL;
   const { user, loading: authLoading } = useAppSelector((state) => state.auth);
-  const { cartInfo, loadingCart } = useAppSelector((state) => state.requests);
 
   useEffect(() => {
     dispatch(fetchCartIcon());
@@ -21,14 +20,6 @@ const AppHeader: FC = () => {
     await dispatch(logoutUser());
     navigate(ROUTES.HOME);
   };
-
-  const handleCartClick = () => {
-    if (cartInfo?.draftId && cartInfo.draftId > 0) {
-      navigate(`${ROUTES.REQUESTS}/${cartInfo.draftId}`);
-    }
-  };
-
-  const hasDraft = Boolean(cartInfo?.draftId && cartInfo.draftId > 0);
 
   return (
     <header className="app-header">
@@ -58,16 +49,6 @@ const AppHeader: FC = () => {
             Выйти
           </button>
         )}
-        <button
-          className={`cart-button ${hasDraft ? 'cart-button--active' : 'cart-button--disabled'}`}
-          type="button"
-          disabled={!hasDraft}
-          onClick={handleCartClick}
-          title={hasDraft ? 'Открыть черновик заявки' : 'Черновой заявки пока нет'}
-        >
-          <img src={`${base}cart.png`} alt="Заявка" />
-          {loadingCart ? <span className="loader-dot" /> : hasDraft && <span className="badge">{cartInfo?.itemCount ?? 0}</span>}
-        </button>
       </div>
     </header>
   );
