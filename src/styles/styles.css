@@ -213,6 +213,16 @@ body, html, #root {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  color: #ffffff;
+}
+
+.auth-card h1 {
+  color: #ffffff;
+}
+
+.auth-card p,
+.auth-subtitle {
+  color: #c9cbe8;
 }
 
 .auth-form {
