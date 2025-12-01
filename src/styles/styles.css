@@ -570,7 +570,7 @@ td {
 .tile-container .title {
   color: #ffffff;
   font-size: 22px;
-  margin-bottom: 4px;
+  margin: 0 0 4px;
 }
 
 .tile-content {
