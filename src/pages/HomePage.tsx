@@ -2,9 +2,11 @@ import type { FC } from 'react';
 import { useMemo } from 'react';
 import Breadcrumbs from '../components/Breadcrumbs';
 import '../styles/styles.css';
+import { useAppInfo } from '../context/AppInfoContext';
 
 const HomePage: FC = () => {
   const base = import.meta.env.BASE_URL;
+  const { appName } = useAppInfo();
   const images = [
     `${base}line/balancer_line.png`,
     `${base}line/cache_line.png`,
@@ -27,7 +29,10 @@ const HomePage: FC = () => {
           <div className="left-column">
             <div className="section">
               <h2 className="section-title">О компании</h2>
-              <p className="section-text">PINGTEST — ведущая компания в области анализа и оптимизации производительности веб-приложений. Мы помогаем бизнесу снижать время отклика и повышать пользовательский опыт.</p>
+              <p className="section-text">
+                {appName} — сервис расчета времени отклика серверных компонентов. Конструктор заявок собран на Redux Toolkit, axios и кодогенерации Swagger, поэтому
+                фронтенд и бэкенд синхронизированы по единому контракту.
+              </p>
             </div>
             <div className="section">
               <h2 className="section-title">Наши услуги</h2>
@@ -39,11 +44,7 @@ const HomePage: FC = () => {
             </div>
           </div>
           <div className="right-image">
-            <img 
-              src={`${base}hero_image.png`} 
-              alt="PINGTEST Optimization" 
-              className="hero-image"
-            />
+            <img src={`${base}hero_image.png`} alt="PINGTEST Optimization" className="hero-image" />
           </div>
         </div>
         <div className="ticker-container">
@@ -57,7 +58,6 @@ const HomePage: FC = () => {
           </div>
         </div>
       </div>
-      <div className="footer">Reduct0r 2025</div>
     </div>
   );
 };

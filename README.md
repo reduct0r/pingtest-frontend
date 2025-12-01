@@ -1,75 +1,47 @@
-# React + TypeScript + Vite
+# PingTest Frontend · Лабораторная 7
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SPA для расчёта времени отклика серверных компонентов. Проект дополняет лабораторную работу №7 и повторяет требования методички по Redux Toolkit, axios и кодогенерации Swagger[^guide].
 
-Currently, two official plugins are available:
+## Основные возможности
+- Авторизация/регистрация с хранением JWT в HttpOnly-cookie, переключение гостевого и пользовательского интерфейса.
+- Redux Toolkit + redux-thunk для каталога услуг, черновика заявки и истории запросов.
+- Сгенерированный клиент `swagger-typescript-api` (axios) + скрипт `npm run generate:api`.
+- Страница каталога с поиском, кнопкой «Добавить» и иконкой черновика.
+- Страница черновика/заявки: изменение количества, удаление компонентов, установка коэффициента и подтверждение.
+- Таблица «Мои заявки» с фильтрами и переходом к деталям.
+- Личный кабинет для обновления логина и пароля.
+- Локальное хранение фильтров/логина (LocalStorage) + инструкция по использованию cookie в Postman/Insomnia.
+- Activity/BPMN диаграмма процесса (`docs/lab7-bpmn.md`).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[^guide]: Методические указания: [iu5git/Web – lab7](https://raw.githubusercontent.com/iu5git/Web/main/tutorials/lab7/README.md)
 
-## React Compiler
+## Быстрый старт
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
-
-Note: This will impact Vite dev & build performances.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run generate:api   # генерирует src/api/Api.ts из Swagger (по умолчанию http://localhost:8081/v3/api-docs)
+npm run dev            # https://localhost:3000 (mkcert сертификат уже настроен в vite.config.ts)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Переменные окружения:
+- `VITE_API_BASE_URL` — при необходимости переопределяет `/api`.
+- `SWAGGER_URL` или `SWAGGER_PATH` — источник OpenAPI-схемы для скрипта генерации.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Сценарии демонстрации
+1. **Авторизация** (страница `/login`): вводим учётные данные → в Application → Cookies появится `jwt`/`refresh`, а в LocalStorage хранится `pingtest:last-username` (можно использовать значение cookie в Postman).
+2. **Каталог** (`/components`): поиск услуги → добавить компонент (кнопка становится активной только для авторизованного пользователя) → иконка черновика отображает счётчик.
+3. **Черновик заявки** (`/requests/:id`): изменение количества, удаление компонентов, установка коэффициента, подтверждение и удаление заявки.
+4. **История заявок** (`/requests`): таблица с фильтром по статусу, переход к заявкам в статусах FORMED/COMPLETED/REJECTED.
+5. **Личный кабинет** (`/profile`): смена логина и пароля.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Дополнительно:
+- Для BPMN/Activity-описания см. `docs/lab7-bpmn.md`.
+- Кодогенерация api: `scripts/generate-api.mjs` (axios + типы + unwrapResponseData).
+- Все сетевые запросы отображают загрузочные состояния/анимации.
+
+## Стек
+- Vite + React 19 + TypeScript
+- Redux Toolkit, redux-thunk, react-router-dom
+- axios + swagger-typescript-api
+- react-bootstrap (базовые формы/spinner), кастомные стили
+- Tauri dev proxy (mkcert) + PWA-плагин

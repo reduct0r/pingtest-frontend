@@ -1,9 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
-import filterReducer from './slices/filterSlice';
+import catalogReducer from './slices/catalogSlice';
+import authReducer from './slices/authSlice';
+import requestsReducer from './slices/requestsSlice';
 
 export const store = configureStore({
   reducer: {
-    filter: filterReducer,
+    catalog: catalogReducer,
+    auth: authReducer,
+    requests: requestsReducer,
   },
 });
 

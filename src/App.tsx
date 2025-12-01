@@ -1,29 +1,41 @@
 import type { FC } from 'react';
-import { HashRouter, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import HomePage from './pages/HomePage';
 import ComponentsListPage from './pages/ComponentsPage';
 import ComponentDetailPage from './pages/ComponentDetailPage';
-import { ROUTES, ROUTE_LABELS } from './Routes';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import RequestsPage from './pages/RequestsPage';
+import RequestDetailPage from './pages/RequestDetailPage';
+import ProfilePage from './pages/ProfilePage';
+import { ROUTES } from './Routes';
 import './styles/styles.css';
+import AppLayout from './components/AppLayout';
+import { useAppDispatch } from './hooks/redux';
+import { bootstrapAuth } from './slices/authSlice';
 
 const App: FC = () => {
-  const base = import.meta.env.BASE_URL;
-  //const basename = base.replace(/\/$/, '');
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(bootstrapAuth());
+  }, [dispatch]);
+
   return (
     <HashRouter>
-      <div className="header-main" style={{ display: 'flex', alignItems: 'center', padding: '0 40px' }}>
-        <Link to={ROUTES.HOME} className="logo-group" style={{ paddingTop: 0, paddingLeft: 0 }}>
-          <img src={`${base}icon.png`} alt="icon" onError={(e) => { e.currentTarget.src = `${base}icon.png`; }} />
-          <span className="logo-title">PINGTEST</span>
-        </Link>
-        <Link to={ROUTES.COMPONENTS} style={{ color: '#ffffff', textDecoration: 'none', transition: 'color 0.3s ease', marginLeft: '20px' }} onMouseOver={(e) => e.currentTarget.style.color = '#1CBFFF'} onMouseOut={(e) => e.currentTarget.style.color = '#ffffff'}>
-          {ROUTE_LABELS.COMPONENTS}
-        </Link>
-      </div>
       <Routes>
-        <Route path={ROUTES.HOME} element={<HomePage />} />
-        <Route path={ROUTES.COMPONENTS} element={<ComponentsListPage />} />
-        <Route path={ROUTES.COMPONENT_DETAIL} element={<ComponentDetailPage />} />
+        <Route element={<AppLayout />}>
+          <Route path={ROUTES.HOME} element={<HomePage />} />
+          <Route path={ROUTES.COMPONENTS} element={<ComponentsListPage />} />
+          <Route path={ROUTES.COMPONENT_DETAIL} element={<ComponentDetailPage />} />
+          <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+          <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+          <Route path={ROUTES.REQUESTS} element={<RequestsPage />} />
+          <Route path={ROUTES.REQUEST_DETAIL} element={<RequestDetailPage />} />
+          <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+          <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+        </Route>
       </Routes>
     </HashRouter>
   );
