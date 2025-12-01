@@ -66,9 +66,9 @@ const ComponentsListPage: FC = () => {
       {user && (
         <button
           type="button"
-          className={`request-icon ${!cartInfo?.draftId ? 'request-icon--disabled' : ''}`}
-          onClick={() => cartInfo?.draftId && navigate(`${ROUTES.REQUESTS}/${cartInfo.draftId}`)}
-          disabled={!cartInfo?.draftId}
+          className={`request-icon ${!cartInfo?.draftId || !cartInfo?.itemCount ? 'request-icon--disabled' : ''}`}
+          onClick={() => cartInfo?.draftId && cartInfo?.itemCount && navigate(`${ROUTES.REQUESTS}/${cartInfo.draftId}`)}
+          disabled={!cartInfo?.draftId || !cartInfo?.itemCount}
         >
           <img src={`${base}cart.png`} alt="Корзина" onError={(e) => (e.currentTarget.src = `${base}placeholder_85x89.png`)} />
           {cartInfo?.itemCount ? <span className="request-badge">{cartInfo.itemCount}</span> : null}
