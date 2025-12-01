@@ -576,8 +576,9 @@ td {
 .tile-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
+  align-self: stretch;
 }
 
 .tile-container .description {
@@ -1101,6 +1102,19 @@ td {
   .card-container {
     width: 280px;
   }
+
+  .tile-container {
+    grid-template-columns: 100px minmax(200px, 1fr) 120px;
+    grid-auto-rows: auto;
+  }
+
+  .ping-main-board {
+    padding: 0 24px;
+  }
+
+  .main-plate {
+    padding: 20px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1116,7 +1130,7 @@ td {
 
   .search-bar {
     width: 90%;
-    margin: 20px auto 0;
+    margin: 0 auto;
   }
 
   .search-bar input {
@@ -1150,6 +1164,47 @@ td {
 
   .ticker-image {
     height: 80px;
+  }
+
+  .main-plate,
+  .ticker-container {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .search-holder {
+    padding: 16px;
+  }
+
+  .tile-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .tile-container .icon {
+    margin: 0 auto;
+  }
+
+  .tile-container .time,
+  .tile-container .quantity,
+  .tile-container .priority {
+    align-self: center;
+  }
+
+  .ping-main-board {
+    padding: 0 16px;
+  }
+
+  .ping-info__row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cart-button,
+  .request-icon {
+    right: 15px;
   }
 }
 
@@ -1202,6 +1257,22 @@ td {
     top: 5px;
     right: 30px;
     padding: 1px 6px;
+    font-size: 14px;
+  }
+
+  .search-holder {
+    padding: 12px;
+  }
+
+  .ping-info,
+  .request-panel,
+  .requests-page,
+  .profile-page {
+    padding: 16px;
+  }
+
+  .requests-page table,
+  .requests-page thead {
     font-size: 14px;
   }
 }
