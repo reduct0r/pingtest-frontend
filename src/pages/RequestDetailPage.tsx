@@ -21,7 +21,7 @@ const RequestDetailPage: FC = () => {
   const navigate = useNavigate();
   const { currentRequest, loadingCurrent, error } = useAppSelector((state) => state.requests);
   const { user } = useAppSelector((state) => state.auth);
-  const [coefficient, setCoefficient] = useState<number | ''>('');
+  const [coefficient, setCoefficient] = useState<number>(1);
 
   useEffect(() => {
     if (requestId) {
@@ -33,7 +33,7 @@ const RequestDetailPage: FC = () => {
     if (currentRequest?.loadCoefficient != null) {
       setCoefficient(currentRequest.loadCoefficient);
     } else {
-      setCoefficient('');
+      setCoefficient(1);
     }
   }, [currentRequest]);
 
@@ -73,6 +73,17 @@ const RequestDetailPage: FC = () => {
 
   const isDraft = currentRequest.status === 'DRAFT';
 
+  const handleCoefficientChange = (value: string) => {
+    if (!currentRequest.id || !isDraft) return;
+
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return;
+
+    const safeValue = parsed < 1 ? 1 : parsed;
+    setCoefficient(safeValue);
+    void dispatch(updateLoadCoefficient({ requestId: currentRequest.id, loadCoefficient: safeValue }));
+  };
+
   const handleQuantityChange = (componentId: number, quantity: number) => {
     if (!Number.isFinite(quantity) || quantity < 1 || !currentRequest.id) return;
     void dispatch(updateItemQuantity({ requestId: currentRequest.id, componentId, quantity }));
@@ -94,11 +105,6 @@ const RequestDetailPage: FC = () => {
     if (deleteRequest.fulfilled.match(result)) {
       navigate(ROUTES.REQUESTS);
     }
-  };
-
-  const handleSaveCoefficient = () => {
-    if (!currentRequest.id || coefficient === '' || !Number.isFinite(Number(coefficient))) return;
-    void dispatch(updateLoadCoefficient({ requestId: currentRequest.id, loadCoefficient: Number(coefficient) }));
   };
 
   return (
@@ -132,33 +138,15 @@ const RequestDetailPage: FC = () => {
                 value={coefficient}
                 min={1}
                 disabled={!isDraft}
-                onChange={(event) => setCoefficient(event.target.value === '' ? '' : Number(event.target.value))}
+                onChange={(event) => handleCoefficientChange(event.target.value)}
               />
             </label>
-            {isDraft && (
-              <button type="button" className="ghost-button" onClick={handleSaveCoefficient}>
-                Сохранить
-              </button>
-            )}
             <div className="ping-totals">
               <p>
                 Количество позиций: <strong>{currentRequest.items.reduce((acc, item) => acc + item.quantity, 0)}</strong>
               </p>
-              <p>
-                Итоговое время: <strong>{currentRequest.totalTime ?? 0} мс</strong>
-              </p>
             </div>
           </div>
-          {isDraft && (
-            <div className="ping-actions">
-              <button type="button" className="ghost-button" onClick={handleForm}>
-                Сформировать заявку
-              </button>
-              <button type="button" className="ghost-button ghost-button--danger" onClick={handleDeleteRequest}>
-                Очистить черновик
-              </button>
-            </div>
-          )}
         </div>
 
         <div className="ping-components-stack">
@@ -205,10 +193,21 @@ const RequestDetailPage: FC = () => {
             ))
           )}
         </div>
+        {isDraft && (
+          <div className="ping-actions">
+            <button type="button" className="ghost-button" onClick={handleForm}>
+              Сформировать заявку
+            </button>
+            <button type="button" className="ghost-button ghost-button--danger" onClick={handleDeleteRequest}>
+              Очистить черновик
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default RequestDetailPage;
+
 
