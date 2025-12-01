@@ -86,14 +86,44 @@ export const fetchRequests = createAsyncThunk<PingTimeDto[], void, { state: Root
   'requests/fetchList',
   async (_, { getState, rejectWithValue }) => {
     try {
-      const { filters } = (getState() as RootState).requests;
+      const state = getState() as RootState;
+      const { filters, cartInfo } = state.requests;
       const query =
         filters.status === 'ALL'
           ? undefined
           : {
               status: filters.status,
             };
-      return await api.pingTime.pingTimeList(query);
+
+      const list = await api.pingTime.pingTimeList(query);
+      let requestsToReturn = list;
+
+      if ((filters.status === 'ALL' || filters.status === 'DRAFT')) {
+        let draftId = cartInfo?.draftId;
+
+        if (!draftId) {
+          try {
+            const latestCart = await api.pingTime.pingTimeCartIconList();
+            draftId = latestCart.draftId;
+          } catch (cartError) {
+            console.warn('[requests] failed to fetch cart icon for draft id', cartError);
+          }
+        }
+
+        if (draftId) {
+          const containsDraft = list.some((item) => item.id === draftId);
+          if (!containsDraft) {
+            try {
+              const draft = await api.pingTime.pingTimeDetail(draftId);
+              requestsToReturn = filters.status === 'DRAFT' ? [draft] : [draft, ...list];
+            } catch (draftError) {
+              console.warn('[requests] failed to fetch draft details', draftError);
+            }
+          }
+        }
+      }
+
+      return requestsToReturn;
     } catch (error) {
       return rejectWithValue(mapError(error));
     }

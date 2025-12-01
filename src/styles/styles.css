@@ -299,6 +299,12 @@ body, html, #root {
   background-color: #05061F;
 }
 
+.filter-bar label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .requests-page table,
 .requests-page th,
 .requests-page td,
