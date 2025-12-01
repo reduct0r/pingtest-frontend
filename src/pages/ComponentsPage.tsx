@@ -1,57 +1,38 @@
 import type { FC } from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Breadcrumbs from '../components/Breadcrumbs';
 import CardComponent from '../components/CardComponent';
-import { getComponents } from '../modules/api';
 import { ROUTE_LABELS } from '../Routes';
 import '../styles/styles.css';
-import type { Component } from '../modules/mock';
-import { useSelector, useDispatch } from 'react-redux';
-import type { RootState } from '../store';
-import { setFilter } from '../slices/filterSlice';
-import { isTauri } from '@tauri-apps/api/core';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { fetchComponents, setSearchValue } from '../slices/catalogSlice';
+import { addComponentToDraft } from '../slices/requestsSlice';
+import Loader from '../components/Loader';
 
 const ComponentsListPage: FC = () => {
   const base = import.meta.env.BASE_URL;
-  const dispatch = useDispatch();
-  const appliedFilter = useSelector((state: RootState) => state.filter.value);
-  const [inputValue, setInputValue] = useState(appliedFilter);
-  const [components, setComponents] = useState<Component[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [_ , setDraftId] = useState<number>(-1);
-  const [itemCount, setItemCount] = useState(0);
+  const dispatch = useAppDispatch();
+  const { items, loading, error, searchValue } = useAppSelector((state) => state.catalog);
+  const { user } = useAppSelector((state) => state.auth);
+  const { mutationLoading } = useAppSelector((state) => state.requests);
+  const [inputValue, setInputValue] = useState(searchValue);
 
   useEffect(() => {
-    setLoading(true);
-    getComponents(appliedFilter).then((data) => {
-      setComponents(data);
-      setLoading(false);
-    });
-  }, [appliedFilter]);
+    dispatch(fetchComponents());
+  }, [dispatch, searchValue]);
 
   useEffect(() => {
-      let cartUrl = '/api/ping-time/cart-icon';
-      if (isTauri()) {
-        cartUrl = 'http://192.168.15.7:8081/api/ping-time/cart-icon';
-    }
-    fetch(cartUrl)
-      .then((response) => {
-        if (!response.ok) throw new Error('Network error');
-        return response.json();
-      })
-      .then((data) => {
-        setDraftId(data.draftId);
-        setItemCount(data.itemCount);
-      })
-      .catch(() => {
-        setDraftId(-1);
-        setItemCount(0);
-      });
-  }, []);
+    setInputValue(searchValue);
+  }, [searchValue]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(setFilter(inputValue));
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    dispatch(setSearchValue(inputValue));
+  };
+
+  const handleAdd = (componentId: number) => {
+    if (!user) return;
+    dispatch(addComponentToDraft(componentId));
   };
 
   return (
@@ -61,31 +42,26 @@ const ComponentsListPage: FC = () => {
         <div className="welcome-title">Компоненты</div>
         <div className="search-holder">
           <form className="search-bar" onSubmit={handleSearch}>
-            <input
-              type="text"
-              placeholder="Поиск серверных компонентов"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-            />
+            <input type="text" placeholder="Поиск серверных компонентов" value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
             <button type="submit" className="search-button">
               <img src={`${base}search_icon.svg`} alt="search" />
             </button>
           </form>
         </div>
         <div className="container-plate">
-          <div className="main-cards-container">
-            {loading ? <p>Загрузка...</p> : components.map((comp) => (
-              <div key={comp.id} style={{ flex: '0 0 300px', margin: '0 auto' }}>
-                <CardComponent component={comp} />
-              </div>
-            ))}
-          </div>
+          {error && <p className="form-error">{error}</p>}
+          {loading ? (
+            <Loader />
+          ) : (
+            <div className="main-cards-container">
+              {items.map((comp) => (
+                <div key={comp.id} style={{ flex: '0 0 300px', margin: '0 auto' }}>
+                  <CardComponent component={comp} canAdd={Boolean(user)} onAdd={handleAdd} isAdding={mutationLoading} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
-      <div className="footer">Reduct0r 2025</div>
-      <div className="request-icon">
-        <img src={`${base}cart.png`} alt="Корзина" onError={(e) => { e.currentTarget.src = `${base}placeholder_85x89.png`; }} />
-        {itemCount > 0 && <span className="request-badge">{itemCount}</span>}
       </div>
     </div>
   );

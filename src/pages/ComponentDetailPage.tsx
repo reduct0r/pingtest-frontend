@@ -2,28 +2,35 @@ import type { FC } from 'react';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
-import { getComponentById } from '../modules/api';
 import { ROUTES, ROUTE_LABELS } from '../Routes';
 import '../styles/details-styles.css';
-import type { Component } from '../modules/mock';
+import type { ComponentDto } from '../api/Api';
+import { api } from '../api';
+import Loader from '../components/Loader';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { addComponentToDraft } from '../slices/requestsSlice';
 
 const ComponentDetailPage: FC = () => {
   const base = import.meta.env.BASE_URL;
   const { id } = useParams<{ id: string }>();
-  const [component, setComponent] = useState<Component | null>(null);
+  const [component, setComponent] = useState<ComponentDto | null>(null);
   const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
+  const { mutationLoading } = useAppSelector((state) => state.requests);
 
   useEffect(() => {
-    if (id) {
-      setLoading(true);
-      getComponentById(parseInt(id)).then((data) => {
-        setComponent(data);
-        setLoading(false);
-      }).catch(() => setLoading(false));
+    if (!id) {
+      return;
     }
+    setLoading(true);
+    api.serverComponents
+      .serverComponentsDetail(Number(id))
+      .then(setComponent)
+      .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <p>Загрузка...</p>;
+  if (loading) return <Loader label="Подгружаем компонент..." />;
   if (!component) return <p>Компонент не найден</p>;
 
   return (
@@ -34,6 +41,16 @@ const ComponentDetailPage: FC = () => {
           <p className="title">{component.title}</p>
           <p className="short-description">{component.description}</p>
           <p className="description-text">{component.longDescription}</p>
+          {user && component.id && (
+            <button
+              type="button"
+              className="primary-button"
+              disabled={mutationLoading}
+              onClick={() => dispatch(addComponentToDraft(component.id ?? 0))}
+            >
+              {mutationLoading ? 'Добавляем...' : 'Добавить в заявку'}
+            </button>
+          )}
         </div>
         <div className="image-holder">
           <img src={component.imageUrl || `${base}placeholder_142x142.png`} alt="icon" />
@@ -45,11 +62,6 @@ const ComponentDetailPage: FC = () => {
           </div>
         </div>
       </div>
-      {/* Checkbox группа, но не для гостя */}
-      <div className="add-to-cart">
-        {/* Form с checkbox, но mock */}
-      </div>
-      <div className="footer">Reduct0r 2025</div>
     </div>
   );
 };
