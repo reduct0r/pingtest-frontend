@@ -818,12 +818,14 @@ td {
 
 .search-holder {
      background-color: #161729;
+     border-radius: 20px;
+     padding: 20px;
 }
 
 .search-bar {
   position: relative;
   width: 480px;
-  margin: 30px auto 0;
+  margin: 0 auto;
 }
 
 .search-bar input {
@@ -862,6 +864,8 @@ td {
 .container-plate {
     background-color: #05061F;
     margin-top: 26px;
+    border-radius: 20px;
+    padding: 20px;
 }
 
 .main-cards-container {
@@ -873,6 +877,7 @@ td {
     justify-content: left;
     max-width: 1300px;
     margin: 0 auto;
+    border-radius: 20px;
 }
 
 .page-wrapper {
