@@ -107,6 +107,8 @@ const RequestDetailPage: FC = () => {
     }
   };
 
+  const showTotalTime = currentRequest.status === 'COMPLETED' && currentRequest.totalTime != null;
+
   return (
     <div className="ping-wrapper">
       <div className="ping-main-board">
@@ -115,9 +117,6 @@ const RequestDetailPage: FC = () => {
             <img src={`${import.meta.env.BASE_URL}icon.png`} alt="PINGTEST" onError={(e) => (e.currentTarget.src = `${import.meta.env.BASE_URL}icon.png`)} />
             <span className="logo-title">PINGTEST</span>
           </div>
-          <button type="button" className="ghost-button ghost-button--secondary" onClick={() => navigate(ROUTES.REQUESTS)}>
-            ← Назад
-          </button>
         </div>
 
         <div className="ping-info">
@@ -193,6 +192,11 @@ const RequestDetailPage: FC = () => {
             ))
           )}
         </div>
+        {showTotalTime && (
+          <div className="ping-total-result">
+            Итоговое время: <span>{currentRequest.totalTime} мс</span>
+          </div>
+        )}
         {isDraft && (
           <div className="ping-actions">
             <button type="button" className="ghost-button" onClick={handleForm}>

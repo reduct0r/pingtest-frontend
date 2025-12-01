@@ -35,16 +35,16 @@ const LoginPage: FC = () => {
     <section className="auth-page">
       <div className="auth-card">
         <h1>Вход в аккаунт</h1>
-        <p>Используйте учетные данные, чтобы продолжить работу с заявками.</p>
+        <p className="auth-subtitle">Используйте учетные данные, чтобы продолжить работу с заявками.</p>
         <form onSubmit={handleSubmit} className="auth-form">
           <label>
             Логин
-            <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="demo" required />
+            <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="example@mail.com" required />
           </label>
 
           <label>
             Пароль
-            <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" required />
+            <input type="password" name="password" value={formData.password} onChange={handleChange} required />
           </label>
 
           {error && <p className="form-error">{error}</p>}

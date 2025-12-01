@@ -96,7 +96,7 @@ const RequestsPage: FC = () => {
                   </td>
                   <td>{new Date(item.createdAt).toLocaleString()}</td>
                   <td>{item.items.reduce((acc, current) => acc + current.quantity, 0)}</td>
-                  <td>{item.totalTime ?? 0}</td>
+                  <td>{item.status === 'COMPLETED' && item.totalTime != null ? item.totalTime : '—'}</td>
                   <td>
                     <button type="button" className="ghost-button" onClick={() => navigate(`${ROUTES.REQUESTS}/${item.id}`)}>
                       Открыть

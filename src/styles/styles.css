@@ -555,6 +555,19 @@ td {
   color: #9193a8;
 }
 
+.ping-total-result {
+  margin-top: 24px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: right;
+}
+
+.ping-total-result span {
+  color: #1cbfff;
+  font-size: 32px;
+}
+
 .tile-container {
   display: grid;
   grid-template-columns: 120px minmax(260px, 2fr) 140px 140px auto 110px;
