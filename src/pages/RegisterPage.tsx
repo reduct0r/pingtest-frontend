@@ -40,11 +40,11 @@ const RegisterPage: FC = () => {
     <section className="auth-page">
       <div className="auth-card">
         <h1>Регистрация</h1>
-        <p>Заведите учетную запись, чтобы добавлять компоненты в заявку и отслеживать статусы.</p>
+        <p className="auth-subtitle">Заведите учетную запись, чтобы добавлять компоненты в заявку и отслеживать статусы.</p>
         <form onSubmit={handleSubmit} className="auth-form">
           <label>
             Логин
-            <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="demo" required />
+            <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="example@mail.com" required />
           </label>
 
           <label>
