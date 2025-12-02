@@ -1,4 +1,5 @@
 import { Api } from './Api';
+import { tauriAxiosAdapter } from './tauriAdapter';
 
 const isTauriBuild = Boolean(import.meta.env.TAURI_PLATFORM ?? import.meta.env.TAURI_ENV_PLATFORM);
 const isTauriBundle = import.meta.env.BASE_URL === './';
@@ -72,4 +73,8 @@ export const fetchWithTauri = async (input: RequestInfo | URL, init?: RequestIni
   }
   return fetch(input, init);
 };
+
+if (isTauriRuntime()) {
+  api.instance.defaults.adapter = tauriAxiosAdapter;
+}
 
