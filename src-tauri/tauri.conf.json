@@ -3,6 +3,7 @@
   "productName": "pingtest-frontend",
   "version": "0.1.0",
   "identifier": "com.pingtestri.rel",
+  "capabilities": ["main-capability"],
   "build": {
     "frontendDist": "../dist",
     "devUrl": "https://localhost:3000",
@@ -34,5 +35,10 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "http": {
+      "scope": ["http://192.168.15.7:8081/*"]
+    }
   }
 }

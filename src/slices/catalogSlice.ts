@@ -41,9 +41,13 @@ export const fetchComponents = createAsyncThunk<ComponentDto[], void, { state: R
   async (_, { getState, rejectWithValue }) => {
     const { searchValue } = (getState() as RootState).catalog;
     try {
-      return await api.serverComponents.serverComponentsList({
+      const result = await api.serverComponents.serverComponentsList({
         filter: searchValue || undefined,
       });
+      if (!Array.isArray(result)) {
+        throw new Error('Unexpected response shape');
+      }
+      return result;
     } catch (error) {
       console.warn('[catalog] Falling back to mock data', error);
       return rejectWithValue(
