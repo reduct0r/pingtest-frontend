@@ -36,6 +36,20 @@ const mapErrorMessage = (message: unknown) => {
   return 'Произошла неизвестная ошибка';
 };
 
+const normalizeUser = (payload: unknown): UserDto => {
+  if (!payload || typeof payload !== 'object') {
+    throw new Error('Некорректный ответ профиля');
+  }
+  const candidate = payload as Partial<UserDto>;
+  if (typeof candidate.id !== 'number' || typeof candidate.username !== 'string' || candidate.username.trim() === '') {
+    throw new Error('Некорректные данные пользователя');
+  }
+  if (typeof candidate.isModerator !== 'boolean') {
+    candidate.isModerator = false;
+  }
+  return candidate as UserDto;
+};
+
 interface AuthState {
   user: UserDto | null;
   loading: boolean;
@@ -57,7 +71,7 @@ export const loginUser = createAsyncThunk<UserDto, LoginDto, { rejectValue: stri
   async (credentials, { rejectWithValue, dispatch }) => {
     try {
       await api.auth.loginCreate(credentials);
-      const profile = await api.users.usersMeDetail();
+      const profile = normalizeUser(await api.users.usersMeDetail());
       persistLastUsername(profile.username);
       dispatch(fetchCartIcon());
       dispatch(fetchRequests());
@@ -83,7 +97,7 @@ export const registerUser = createAsyncThunk<UserDto, UserRegistrationDto, { rej
   'auth/registerUser',
   async (payload, { rejectWithValue }) => {
     try {
-      const user = await api.users.usersRegisterCreate(payload);
+      const user = normalizeUser(await api.users.usersRegisterCreate(payload));
       persistLastUsername(user.username);
       return user;
     } catch (error) {
@@ -95,15 +109,15 @@ export const registerUser = createAsyncThunk<UserDto, UserRegistrationDto, { rej
 export const bootstrapAuth = createAsyncThunk<UserDto | null, void, { rejectValue: string; dispatch: AppDispatch }>(
   'auth/bootstrapAuth',
   async (_, { rejectWithValue, dispatch }) => {
-  try {
-    const profile = await api.users.usersMeDetail();
-    persistLastUsername(profile.username);
-    dispatch(fetchCartIcon());
-    dispatch(fetchRequests());
-    return profile;
-  } catch (error) {
-    return rejectWithValue(mapErrorMessage(error));
-  }
+    try {
+      const profile = normalizeUser(await api.users.usersMeDetail());
+      persistLastUsername(profile.username);
+      dispatch(fetchCartIcon());
+      dispatch(fetchRequests());
+      return profile;
+    } catch (error) {
+      return rejectWithValue(mapErrorMessage(error));
+    }
   },
 );
 
@@ -111,7 +125,7 @@ export const updateProfile = createAsyncThunk<UserDto, UserUpdateDto, { rejectVa
   'auth/updateProfile',
   async (dto, { rejectWithValue }) => {
     try {
-      const profile = await api.users.usersMeUpdate(dto);
+      const profile = normalizeUser(await api.users.usersMeUpdate(dto));
       persistLastUsername(profile.username);
       return profile;
     } catch (error) {
