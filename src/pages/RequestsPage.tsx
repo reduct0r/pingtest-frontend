@@ -20,15 +20,27 @@ const RequestsPage: FC = () => {
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
   const { requests, loadingList, filters, error } = useAppSelector((state) => state.requests);
+  const isDateRangeValid =
+    !filters.startDate || !filters.endDate || filters.startDate <= filters.endDate;
 
   useEffect(() => {
-    if (user) {
+    if (user && isDateRangeValid) {
       dispatch(fetchRequests());
     }
-  }, [dispatch, user, filters.status]);
+  }, [dispatch, user, filters.status, filters.startDate, filters.endDate, isDateRangeValid]);
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     dispatch(setFilters({ status: event.target.value as typeof filters.status }));
+  };
+
+  const handleDateChange =
+    (field: 'startDate' | 'endDate') => (event: ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value || null;
+      dispatch(setFilters({ [field]: value }));
+    };
+
+  const handleResetDates = () => {
+    dispatch(setFilters({ startDate: null, endDate: null }));
   };
 
   if (!user) {
@@ -51,6 +63,29 @@ const RequestsPage: FC = () => {
         </div>
         <div className="filter-bar">
           <label>
+            Дата от
+            <input
+              type="date"
+              value={filters.startDate ?? ''}
+              onChange={handleDateChange('startDate')}
+              max={filters.endDate ?? undefined}
+            />
+          </label>
+          <label>
+            Дата до
+            <input
+              type="date"
+              value={filters.endDate ?? ''}
+              onChange={handleDateChange('endDate')}
+              min={filters.startDate ?? undefined}
+            />
+          </label>
+          {(filters.startDate || filters.endDate) && (
+            <button type="button" className="ghost-button" onClick={handleResetDates}>
+              Сбросить
+            </button>
+          )}
+          <label>
             Статус
             <select value={filters.status} onChange={handleStatusChange}>
               <option value="ALL">Все</option>
@@ -61,6 +96,9 @@ const RequestsPage: FC = () => {
             </select>
           </label>
         </div>
+        {!isDateRangeValid && (
+          <p className="form-error">Дата "от" не может быть позже даты "до".</p>
+        )}
       </div>
 
       {error && <p className="form-error">{error}</p>}

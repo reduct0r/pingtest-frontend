@@ -8,21 +8,46 @@ const FILTER_STORAGE_KEY = 'pingtest:requests-filter';
 
 interface RequestFilters {
   status: PingTimeStatus | 'ALL';
+  startDate: string | null;
+  endDate: string | null;
 }
+
+const isDateInputValue = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
+const formatDateForApi = (value: string | null, endOfDay = false) => {
+  if (!value) {
+    return null;
+  }
+  const trimmed = value.trim();
+  if (!isDateInputValue(trimmed)) {
+    return trimmed;
+  }
+  const time = endOfDay ? '23:59:59' : '00:00:00';
+  return `${trimmed}T${time}`;
+};
+
+const DEFAULT_FILTERS: RequestFilters = {
+  status: 'ALL',
+  startDate: null,
+  endDate: null,
+};
 
 const readFilters = (): RequestFilters => {
   if (typeof window === 'undefined') {
-    return { status: 'ALL' };
+    return { ...DEFAULT_FILTERS };
   }
   try {
     const stored = localStorage.getItem(FILTER_STORAGE_KEY);
     if (stored) {
-      return JSON.parse(stored) as RequestFilters;
+      const parsed = JSON.parse(stored) as Partial<RequestFilters>;
+      return {
+        ...DEFAULT_FILTERS,
+        ...parsed,
+      };
     }
   } catch (error) {
     console.warn('[requests] failed to read filters', error);
   }
-  return { status: 'ALL' };
+  return { ...DEFAULT_FILTERS };
 };
 
 const persistFilters = (filters: RequestFilters) => {
@@ -88,14 +113,22 @@ export const fetchRequests = createAsyncThunk<PingTimeDto[], void, { state: Root
     try {
       const state = getState() as RootState;
       const { filters, cartInfo } = state.requests;
-      const query =
-        filters.status === 'ALL'
-          ? undefined
-          : {
-              status: filters.status,
-            };
+      const query: { status?: PingTimeStatus | string; fromDate?: string | null; toDate?: string | null } = {};
+      if (filters.status !== 'ALL') {
+        query.status = filters.status;
+      }
+      const fromDate = formatDateForApi(filters.startDate, false);
+      const toDate = formatDateForApi(filters.endDate, true);
+      if (fromDate) {
+        query.fromDate = fromDate;
+      }
+      if (toDate) {
+        query.toDate = toDate;
+      }
 
-      const list = await api.pingTime.pingTimeList(query);
+      const requestQuery = Object.keys(query).length > 0 ? query : undefined;
+
+      const list = await api.pingTime.pingTimeList(requestQuery);
       let requestsToReturn = list;
 
       if ((filters.status === 'ALL' || filters.status === 'DRAFT')) {
@@ -209,12 +242,15 @@ const requestsSlice = createSlice({
   name: 'requests',
   initialState,
   reducers: {
-    setFilters: (state, action: PayloadAction<RequestFilters>) => {
-      state.filters = action.payload;
-      persistFilters(action.payload);
+    setFilters: (state, action: PayloadAction<Partial<RequestFilters>>) => {
+      state.filters = {
+        ...state.filters,
+        ...action.payload,
+      };
+      persistFilters(state.filters);
     },
     resetRequestsState: (state) => {
-      persistFilters({ status: 'ALL' });
+      persistFilters(DEFAULT_FILTERS);
       state.cartInfo = initialState.cartInfo;
       state.currentRequest = initialState.currentRequest;
       state.requests = [];
@@ -223,7 +259,7 @@ const requestsSlice = createSlice({
       state.loadingList = false;
       state.mutationLoading = false;
       state.error = null;
-      state.filters = { status: 'ALL' };
+      state.filters = { ...DEFAULT_FILTERS };
     },
     clearRequestError: (state) => {
       state.error = null;
