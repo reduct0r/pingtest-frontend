@@ -23,6 +23,14 @@ const RequestsPage: FC = () => {
   const isDateRangeValid =
     !filters.startDate || !filters.endDate || filters.startDate <= filters.endDate;
 
+  // Устанавливаем сегодняшние даты при первом заходе на страницу, если они не установлены
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    if (!filters.startDate || !filters.endDate) {
+      dispatch(setFilters({ startDate: today, endDate: today }));
+    }
+  }, []); // Только при монтировании компонента
+
   useEffect(() => {
     if (user && isDateRangeValid) {
       dispatch(fetchRequests());

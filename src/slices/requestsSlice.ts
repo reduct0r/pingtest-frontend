@@ -4,8 +4,6 @@ import { api } from '../api';
 import type { AppDispatch, RootState } from '../store';
 import axios from 'axios';
 
-const FILTER_STORAGE_KEY = 'pingtest:requests-filter';
-
 interface RequestFilters {
   status: PingTimeStatus | 'ALL';
   startDate: string | null;
@@ -25,36 +23,21 @@ const formatDateForApi = (value: string | null, endOfDay = false) => {
   return `${trimmed}T${time}`;
 };
 
-const DEFAULT_FILTERS: RequestFilters = {
-  status: 'ALL',
-  startDate: null,
-  endDate: null,
+const getTodayDate = (): string => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
-const readFilters = (): RequestFilters => {
-  if (typeof window === 'undefined') {
-    return { ...DEFAULT_FILTERS };
-  }
-  try {
-    const stored = localStorage.getItem(FILTER_STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored) as Partial<RequestFilters>;
-      return {
-        ...DEFAULT_FILTERS,
-        ...parsed,
-      };
-    }
-  } catch (error) {
-    console.warn('[requests] failed to read filters', error);
-  }
-  return { ...DEFAULT_FILTERS };
-};
-
-const persistFilters = (filters: RequestFilters) => {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
+const getDefaultFilters = (): RequestFilters => {
+  const today = getTodayDate();
+  return {
+    status: 'ALL',
+    startDate: today,
+    endDate: today,
+  };
 };
 
 interface RequestsState {
@@ -73,7 +56,7 @@ const initialState: RequestsState = {
   cartInfo: null,
   currentRequest: null,
   requests: [],
-  filters: readFilters(),
+  filters: getDefaultFilters(),
   loadingCart: false,
   loadingCurrent: false,
   loadingList: false,
@@ -247,10 +230,10 @@ const requestsSlice = createSlice({
         ...state.filters,
         ...action.payload,
       };
-      persistFilters(state.filters);
+      // Фильтры сохраняются только в памяти (Redux state), не в localStorage
     },
     resetRequestsState: (state) => {
-      persistFilters(DEFAULT_FILTERS);
+      const defaultFilters = getDefaultFilters();
       state.cartInfo = initialState.cartInfo;
       state.currentRequest = initialState.currentRequest;
       state.requests = [];
@@ -259,7 +242,7 @@ const requestsSlice = createSlice({
       state.loadingList = false;
       state.mutationLoading = false;
       state.error = null;
-      state.filters = { ...DEFAULT_FILTERS };
+      state.filters = { ...defaultFilters };
     },
     clearRequestError: (state) => {
       state.error = null;
