@@ -89,10 +89,10 @@ const RequestsPage: FC = () => {
             Статус
             <select value={filters.status} onChange={handleStatusChange}>
               <option value="ALL">Все</option>
-              <option value="DRAFT">Черновик</option>
               <option value="FORMED">Сформирована</option>
               <option value="COMPLETED">Завершена</option>
               <option value="REJECTED">Отклонена</option>
+              <option value="ARCHIVED">Архив</option>
             </select>
           </label>
         </div>
@@ -113,37 +113,38 @@ const RequestsPage: FC = () => {
           </Link>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Статус</th>
-                <th>Создана</th>
-                <th>Всего компонентов</th>
-                <th>Время, мс</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {requests.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.id}</td>
-                  <td>
-                    <span className={`status-chip status-chip--${item.status.toLowerCase()}`}>{statusLabels[item.status] ?? item.status}</span>
-                  </td>
-                  <td>{new Date(item.createdAt).toLocaleString()}</td>
-                  <td>{item.items.reduce((acc, current) => acc + current.quantity, 0)}</td>
-                  <td>{item.status === 'COMPLETED' && item.totalTime != null ? item.totalTime : '—'}</td>
-                  <td>
-                    <button type="button" className="ghost-button" onClick={() => navigate(`${ROUTES.REQUESTS}/${item.id}`)}>
-                      Открыть
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="requests-cards-container">
+          {requests
+            .filter((item) => item.status !== 'DRAFT' && item.status !== 'DELETED')
+            .map((item) => (
+              <div
+                key={item.id}
+                className="request-card"
+                onClick={() => navigate(`${ROUTES.REQUESTS}/${item.id}`)}
+              >
+                <div className="request-card-id">ID: {item.id}</div>
+                <div className="request-card-status">
+                  <span className={`status-chip status-chip--${item.status.toLowerCase()}`}>
+                    {statusLabels[item.status] ?? item.status}
+                  </span>
+                </div>
+                <div className="request-card-date">
+                  {new Date(item.createdAt).toLocaleString()}
+                </div>
+                <div className="request-card-coefficient">
+                  Коэф. нагрузки: <strong>{item.loadCoefficient ?? 1}</strong>
+                </div>
+                <div className="request-card-time">
+                  {item.status === 'COMPLETED' && item.totalTime != null ? (
+                    <>
+                      Время: <strong>{item.totalTime} мс</strong>
+                    </>
+                  ) : (
+                    'Время: —'
+                  )}
+                </div>
+              </div>
+            ))}
         </div>
       )}
     </section>

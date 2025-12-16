@@ -115,28 +115,9 @@ const RequestDetailPage: FC = () => {
     }
   };
 
-  const handleForm = async () => {
+  const handleForm = () => {
     if (!currentRequest.id || !isDraft) return;
-    
-    // Сначала сохраняем все изменения количества элементов
-    const promises = Object.entries(itemQuantities).map(([componentIdStr, quantity]) => {
-      const componentId = Number(componentIdStr);
-      const currentItem = currentRequest.items.find((item) => item.componentId === componentId);
-      if (currentItem && currentItem.quantity !== quantity) {
-        return dispatch(updateItemQuantity({ requestId: currentRequest.id!, componentId, quantity }));
-      }
-      return Promise.resolve();
-    });
-
-    // Сохраняем коэффициент нагрузки, если он изменился
-    if (currentRequest.loadCoefficient !== coefficient) {
-      promises.push(dispatch(updateLoadCoefficient({ requestId: currentRequest.id, loadCoefficient: coefficient })));
-    }
-
-    // Ждем сохранения всех изменений
-    await Promise.all(promises);
-    
-    // Затем формируем заявку
+    // Формируем заявку без автоматического сохранения
     void dispatch(formRequest(currentRequest.id));
   };
 
@@ -155,7 +136,7 @@ const RequestDetailPage: FC = () => {
     }
   };
 
-  const handleSaveItems = async () => {
+  const handleSaveQuantities = async () => {
     // Сохранение всех изменений количества элементов в БД
     if (!currentRequest.id || !isDraft) return;
 
@@ -172,13 +153,6 @@ const RequestDetailPage: FC = () => {
     await Promise.all(promises);
     // Обновляем данные заявки после сохранения
     void dispatch(fetchRequestById(currentRequest.id));
-  };
-
-  const handleSaveFields = () => {
-    // Сохранение полей заявки (коэффициента) в БД
-    if (currentRequest.id && isDraft) {
-      void dispatch(updateLoadCoefficient({ requestId: currentRequest.id, loadCoefficient: coefficient }));
-    }
   };
 
   const showTotalTimeValue = currentRequest.status === 'COMPLETED' && currentRequest.totalTime != null;
@@ -273,11 +247,8 @@ const RequestDetailPage: FC = () => {
         </div>
         {isDraft && (
           <div className="ping-actions">
-            <button type="button" className="ghost-button" onClick={handleSaveItems}>
-              Сохранить м-м
-            </button>
-            <button type="button" className="ghost-button" onClick={handleSaveFields}>
-              Сохранить поля заявки
+            <button type="button" className="ghost-button" onClick={handleSaveQuantities}>
+              Сохранить кол-во
             </button>
             <button type="button" className="ghost-button" onClick={handleForm}>
               Сформировать заявку
