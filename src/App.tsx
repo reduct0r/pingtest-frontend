@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
 import HomePage from './pages/HomePage';
 import ComponentsListPage from './pages/ComponentsPage';
 import ComponentDetailPage from './pages/ComponentDetailPage';
@@ -12,15 +11,8 @@ import ProfilePage from './pages/ProfilePage';
 import { ROUTES } from './Routes';
 import './styles/styles.css';
 import AppLayout from './components/AppLayout';
-import { useAppDispatch } from './hooks/redux';
-import { bootstrapAuth } from './slices/authSlice';
 
 const App: FC = () => {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(bootstrapAuth());
-  }, [dispatch]);
 
   return (
     <HashRouter>

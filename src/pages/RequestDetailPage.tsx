@@ -107,7 +107,23 @@ const RequestDetailPage: FC = () => {
     }
   };
 
-  const showTotalTime = currentRequest.status === 'COMPLETED' && currentRequest.totalTime != null;
+  const handleSaveItems = () => {
+    // Сохранение элементов заявки (м-м) уже происходит автоматически при изменении
+    // Эта кнопка может быть использована для явного сохранения всех изменений
+    if (currentRequest.id) {
+      void dispatch(fetchRequestById(currentRequest.id));
+    }
+  };
+
+  const handleSaveFields = () => {
+    // Сохранение полей заявки уже происходит автоматически при изменении коэффициента
+    // Эта кнопка может быть использована для явного сохранения всех полей
+    if (currentRequest.id) {
+      void dispatch(updateLoadCoefficient({ requestId: currentRequest.id, loadCoefficient: coefficient }));
+    }
+  };
+
+  const showTotalTimeValue = currentRequest.status === 'COMPLETED' && currentRequest.totalTime != null;
 
   return (
     <div className="ping-wrapper">
@@ -192,13 +208,17 @@ const RequestDetailPage: FC = () => {
             ))
           )}
         </div>
-        {showTotalTime && (
-          <div className="ping-total-result">
-            Итоговое время: <span>{currentRequest.totalTime} мс</span>
-          </div>
-        )}
+        <div className="ping-total-result">
+          Итоговое время: {showTotalTimeValue ? <span>{currentRequest.totalTime} мс</span> : ''}
+        </div>
         {isDraft && (
           <div className="ping-actions">
+            <button type="button" className="ghost-button" onClick={handleSaveItems}>
+              Сохранить м-м
+            </button>
+            <button type="button" className="ghost-button" onClick={handleSaveFields}>
+              Сохранить поля заявки
+            </button>
             <button type="button" className="ghost-button" onClick={handleForm}>
               Сформировать заявку
             </button>
