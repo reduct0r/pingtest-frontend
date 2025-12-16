@@ -22,6 +22,7 @@ const RequestDetailPage: FC = () => {
   const { currentRequest, loadingCurrent, error } = useAppSelector((state) => state.requests);
   const { user } = useAppSelector((state) => state.auth);
   const [coefficient, setCoefficient] = useState<number>(1);
+  const [itemQuantities, setItemQuantities] = useState<Record<number, number>>({});
 
   useEffect(() => {
     if (requestId) {
@@ -34,6 +35,14 @@ const RequestDetailPage: FC = () => {
       setCoefficient(currentRequest.loadCoefficient);
     } else {
       setCoefficient(1);
+    }
+    // Инициализируем локальные значения количества для каждого элемента
+    if (currentRequest?.items) {
+      const quantities: Record<number, number> = {};
+      currentRequest.items.forEach((item) => {
+        quantities[item.componentId] = item.quantity;
+      });
+      setItemQuantities(quantities);
     }
   }, [currentRequest]);
 
@@ -74,28 +83,60 @@ const RequestDetailPage: FC = () => {
   const isDraft = currentRequest.status === 'DRAFT';
 
   const handleCoefficientChange = (value: string) => {
-    if (!currentRequest.id || !isDraft) return;
+    if (!isDraft) return;
 
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) return;
 
     const safeValue = parsed < 1 ? 1 : parsed;
     setCoefficient(safeValue);
-    void dispatch(updateLoadCoefficient({ requestId: currentRequest.id, loadCoefficient: safeValue }));
+    // Не сохраняем автоматически, только обновляем локальное состояние
   };
 
   const handleQuantityChange = (componentId: number, quantity: number) => {
-    if (!Number.isFinite(quantity) || quantity < 1 || !currentRequest.id) return;
-    void dispatch(updateItemQuantity({ requestId: currentRequest.id, componentId, quantity }));
+    if (!Number.isFinite(quantity) || quantity < 1) return;
+    // Обновляем только локальное состояние
+    setItemQuantities((prev) => ({
+      ...prev,
+      [componentId]: quantity,
+    }));
   };
 
-  const handleDeleteItem = (componentId: number) => {
+  const handleDeleteItem = async (componentId: number) => {
     if (!currentRequest.id) return;
-    void dispatch(deleteItemFromDraft({ requestId: currentRequest.id, componentId }));
+    const result = await dispatch(deleteItemFromDraft({ requestId: currentRequest.id, componentId }));
+    // Обновляем локальное состояние после удаления
+    if (deleteItemFromDraft.fulfilled.match(result)) {
+      setItemQuantities((prev) => {
+        const newQuantities = { ...prev };
+        delete newQuantities[componentId];
+        return newQuantities;
+      });
+    }
   };
 
-  const handleForm = () => {
-    if (!currentRequest.id) return;
+  const handleForm = async () => {
+    if (!currentRequest.id || !isDraft) return;
+    
+    // Сначала сохраняем все изменения количества элементов
+    const promises = Object.entries(itemQuantities).map(([componentIdStr, quantity]) => {
+      const componentId = Number(componentIdStr);
+      const currentItem = currentRequest.items.find((item) => item.componentId === componentId);
+      if (currentItem && currentItem.quantity !== quantity) {
+        return dispatch(updateItemQuantity({ requestId: currentRequest.id!, componentId, quantity }));
+      }
+      return Promise.resolve();
+    });
+
+    // Сохраняем коэффициент нагрузки, если он изменился
+    if (currentRequest.loadCoefficient !== coefficient) {
+      promises.push(dispatch(updateLoadCoefficient({ requestId: currentRequest.id, loadCoefficient: coefficient })));
+    }
+
+    // Ждем сохранения всех изменений
+    await Promise.all(promises);
+    
+    // Затем формируем заявку
     void dispatch(formRequest(currentRequest.id));
   };
 
@@ -107,18 +148,35 @@ const RequestDetailPage: FC = () => {
     }
   };
 
-  const handleSaveItems = () => {
-    // Сохранение элементов заявки (м-м) уже происходит автоматически при изменении
-    // Эта кнопка может быть использована для явного сохранения всех изменений
-    if (currentRequest.id) {
-      void dispatch(fetchRequestById(currentRequest.id));
+  const handleSaveCoefficient = () => {
+    // Сохранение коэффициента нагрузки в БД
+    if (currentRequest.id && isDraft) {
+      void dispatch(updateLoadCoefficient({ requestId: currentRequest.id, loadCoefficient: coefficient }));
     }
   };
 
+  const handleSaveItems = async () => {
+    // Сохранение всех изменений количества элементов в БД
+    if (!currentRequest.id || !isDraft) return;
+
+    const promises = Object.entries(itemQuantities).map(([componentIdStr, quantity]) => {
+      const componentId = Number(componentIdStr);
+      const currentItem = currentRequest.items.find((item) => item.componentId === componentId);
+      // Сохраняем только если количество изменилось
+      if (currentItem && currentItem.quantity !== quantity) {
+        return dispatch(updateItemQuantity({ requestId: currentRequest.id!, componentId, quantity }));
+      }
+      return Promise.resolve();
+    });
+
+    await Promise.all(promises);
+    // Обновляем данные заявки после сохранения
+    void dispatch(fetchRequestById(currentRequest.id));
+  };
+
   const handleSaveFields = () => {
-    // Сохранение полей заявки уже происходит автоматически при изменении коэффициента
-    // Эта кнопка может быть использована для явного сохранения всех полей
-    if (currentRequest.id) {
+    // Сохранение полей заявки (коэффициента) в БД
+    if (currentRequest.id && isDraft) {
       void dispatch(updateLoadCoefficient({ requestId: currentRequest.id, loadCoefficient: coefficient }));
     }
   };
@@ -156,9 +214,14 @@ const RequestDetailPage: FC = () => {
                 onChange={(event) => handleCoefficientChange(event.target.value)}
               />
             </label>
+            {isDraft && (
+              <button type="button" className="ghost-button" onClick={handleSaveCoefficient}>
+                Сохранить коэф.
+              </button>
+            )}
             <div className="ping-totals">
               <p>
-                Количество позиций: <strong>{currentRequest.items.reduce((acc, item) => acc + item.quantity, 0)}</strong>
+                Количество позиций: <strong>{currentRequest.items.reduce((acc, item) => acc + (itemQuantities[item.componentId] ?? item.quantity), 0)}</strong>
               </p>
             </div>
           </div>
@@ -189,7 +252,7 @@ const RequestDetailPage: FC = () => {
                   <input
                     type="number"
                     className="mini-input"
-                    value={item.quantity}
+                    value={itemQuantities[item.componentId] ?? item.quantity}
                     min={1}
                     disabled={!isDraft}
                     onChange={(event) => handleQuantityChange(item.componentId, Number(event.target.value))}
@@ -208,9 +271,6 @@ const RequestDetailPage: FC = () => {
             ))
           )}
         </div>
-        <div className="ping-total-result">
-          Итоговое время: {showTotalTimeValue ? <span>{currentRequest.totalTime} мс</span> : ''}
-        </div>
         {isDraft && (
           <div className="ping-actions">
             <button type="button" className="ghost-button" onClick={handleSaveItems}>
@@ -227,6 +287,9 @@ const RequestDetailPage: FC = () => {
             </button>
           </div>
         )}
+        <div className="ping-total-result">
+          Итоговое время: {showTotalTimeValue ? <span>{currentRequest.totalTime} мс</span> : ''}
+        </div>
       </div>
     </div>
   );
