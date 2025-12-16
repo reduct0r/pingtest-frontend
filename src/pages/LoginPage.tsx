@@ -9,9 +9,9 @@ import Loader from '../components/Loader';
 const LoginPage: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { error, loading, lastUsername } = useAppSelector((state) => state.auth);
+  const { error, loading } = useAppSelector((state) => state.auth);
   const [formData, setFormData] = useState({
-    username: lastUsername ?? '',
+    username: '',
     password: '',
   });
 
