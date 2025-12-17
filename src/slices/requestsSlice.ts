@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { ItemUpdateDto, PingTimeDto, PingTimeStatus, PingTimeUpdateDto, TimePingIconDto } from '../api/Api';
+import type { ItemUpdateDto, ModerateActionDto, PingTimeDto, PingTimeStatus, PingTimeUpdateDto, TimePingIconDto } from '../api/Api';
 import { api } from '../api';
 import type { AppDispatch, RootState } from '../store';
 import axios from 'axios';
@@ -8,6 +8,7 @@ interface RequestFilters {
   status: PingTimeStatus | 'ALL';
   startDate: string | null;
   endDate: string | null;
+  creatorFilter: string | null; // Фильтр по создателю (на фронтенде)
 }
 
 const isDateInputValue = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
@@ -37,6 +38,7 @@ const getDefaultFilters = (): RequestFilters => {
     status: 'ALL',
     startDate: today,
     endDate: today,
+    creatorFilter: null,
   };
 };
 
@@ -113,6 +115,14 @@ export const fetchRequests = createAsyncThunk<PingTimeDto[], void, { state: Root
 
       const list = await api.pingTime.pingTimeList(requestQuery);
       let requestsToReturn = list;
+      
+      // Фильтрация по создателю на фронтенде
+      const { creatorFilter } = state.requests.filters;
+      if (creatorFilter && creatorFilter.trim() !== '') {
+        requestsToReturn = requestsToReturn.filter((req) =>
+          req.creatorUsername.toLowerCase().includes(creatorFilter.toLowerCase())
+        );
+      }
 
       if ((filters.status === 'ALL' || filters.status === 'DRAFT')) {
         let draftId = cartInfo?.draftId;
@@ -215,6 +225,21 @@ export const updateLoadCoefficient = createAsyncThunk<PingTimeDto, { requestId: 
     try {
       const payload: PingTimeUpdateDto = { loadCoefficient };
       return await api.pingTime.pingTimeUpdate(requestId, payload);
+    } catch (error) {
+      return rejectWithValue(mapError(error));
+    }
+  },
+);
+
+export const moderateRequest = createAsyncThunk<PingTimeDto, { requestId: number; action: 'COMPLETE' | 'REJECT' }, { rejectValue: string; dispatch: AppDispatch }>(
+  'requests/moderateRequest',
+  async ({ requestId, action }, { rejectWithValue, dispatch }) => {
+    try {
+      const payload: ModerateActionDto = { action };
+      const updated = await api.pingTime.pingTimeModerateUpdate(requestId, payload);
+      // При завершении заявки (COMPLETE) основной бэкенд автоматически вызывает асинхронный сервис
+      dispatch(fetchRequests());
+      return updated;
     } catch (error) {
       return rejectWithValue(mapError(error));
     }
@@ -337,6 +362,18 @@ const requestsSlice = createSlice({
         state.currentRequest = action.payload;
       })
       .addCase(updateLoadCoefficient.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      .addCase(moderateRequest.pending, (state) => {
+        state.mutationLoading = true;
+        state.error = null;
+      })
+      .addCase(moderateRequest.fulfilled, (state, action) => {
+        state.mutationLoading = false;
+        state.currentRequest = action.payload;
+      })
+      .addCase(moderateRequest.rejected, (state, action) => {
+        state.mutationLoading = false;
         state.error = action.payload as string;
       });
   },

@@ -1,8 +1,8 @@
 import type { FC, ChangeEvent } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { fetchRequests, setFilters } from '../slices/requestsSlice';
+import { fetchRequests, setFilters, moderateRequest } from '../slices/requestsSlice';
 import Loader from '../components/Loader';
 import { ROUTES } from '../Routes';
 
@@ -19,9 +19,11 @@ const RequestsPage: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
-  const { requests, loadingList, filters, error } = useAppSelector((state) => state.requests);
+  const { requests, loadingList, filters, error, mutationLoading } = useAppSelector((state) => state.requests);
   const isDateRangeValid =
     !filters.startDate || !filters.endDate || filters.startDate <= filters.endDate;
+  const isModerator = Boolean(user?.isModerator);
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Устанавливаем сегодняшние даты при первом заходе на страницу, если они не установлены
   useEffect(() => {
@@ -31,11 +33,26 @@ const RequestsPage: FC = () => {
     }
   }, []); // Только при монтировании компонента
 
+  // Short polling только для модераторов
   useEffect(() => {
     if (user && isDateRangeValid) {
+      // Первый запрос сразу
       dispatch(fetchRequests());
+      
+      // Short polling только для модераторов (каждые 3 секунды)
+      if (isModerator) {
+        pollingIntervalRef.current = setInterval(() => {
+          dispatch(fetchRequests());
+        }, 3000);
+
+        return () => {
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+          }
+        };
+      }
     }
-  }, [dispatch, user, filters.status, filters.startDate, filters.endDate, isDateRangeValid]);
+  }, [dispatch, user, isModerator, filters.status, filters.startDate, filters.endDate, filters.creatorFilter, isDateRangeValid]);
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     dispatch(setFilters({ status: event.target.value as typeof filters.status }));
@@ -49,6 +66,14 @@ const RequestsPage: FC = () => {
 
   const handleResetDates = () => {
     dispatch(setFilters({ startDate: null, endDate: null }));
+  };
+
+  const handleCreatorFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
+    dispatch(setFilters({ creatorFilter: event.target.value || null }));
+  };
+
+  const handleModerate = async (requestId: number, action: 'COMPLETE' | 'REJECT') => {
+    await dispatch(moderateRequest({ requestId, action }));
   };
 
   if (!user) {
@@ -66,8 +91,17 @@ const RequestsPage: FC = () => {
     <section className="requests-page">
       <div className="requests-header">
         <div>
-          <h1>Мои заявки</h1>
-          <p>Добавляйте серверные компоненты в заявку и отслеживайте статусы обработки.</p>
+          <h1>{isModerator ? 'Все заявки' : 'Мои заявки'}</h1>
+          <p>
+            {isModerator 
+              ? 'Просматривайте и модерируйте все заявки в системе.' 
+              : 'Добавляйте серверные компоненты в заявку и отслеживайте статусы обработки.'}
+          </p>
+          {isModerator && (
+            <p style={{ color: '#1cbfff', fontSize: '14px', marginTop: '8px' }}>
+              Режим модератора активен
+            </p>
+          )}
         </div>
         <div className="filter-bar">
           <label>
@@ -103,6 +137,17 @@ const RequestsPage: FC = () => {
               <option value="ARCHIVED">Архив</option>
             </select>
           </label>
+          {isModerator && (
+            <label>
+              Создатель
+              <input
+                type="text"
+                placeholder="Фильтр по имени..."
+                value={filters.creatorFilter ?? ''}
+                onChange={handleCreatorFilterChange}
+              />
+            </label>
+          )}
         </div>
         {!isDateRangeValid && (
           <p className="form-error">Дата "от" не может быть позже даты "до".</p>
@@ -128,7 +173,7 @@ const RequestsPage: FC = () => {
               <div
                 key={item.id}
                 className="request-card"
-                onClick={() => navigate(`${ROUTES.REQUESTS}/${item.id}`)}
+                onClick={() => item.id && navigate(`${ROUTES.REQUESTS}/${item.id}`)}
               >
                 <div className="request-card-id">ID: {item.id}</div>
                 <div className="request-card-status">
@@ -139,18 +184,43 @@ const RequestsPage: FC = () => {
                 <div className="request-card-date">
                   {new Date(item.createdAt).toLocaleString()}
                 </div>
+                <div className="request-card-creator">
+                  Создатель: <strong>{item.creatorUsername}</strong>
+                </div>
                 <div className="request-card-coefficient">
                   Коэф. нагрузки: <strong>{item.loadCoefficient ?? 1}</strong>
                 </div>
-                <div className="request-card-time">
-                  {item.status === 'COMPLETED' && item.totalTime != null ? (
-                    <>
-                      Время: <strong>{item.totalTime} мс</strong>
-                    </>
-                  ) : (
-                    'Время: —'
-                  )}
-                </div>
+                  <div className="request-card-time">
+                    {item.status === 'COMPLETED' && item.totalTime != null && item.totalTime > 0 ? (
+                      <>
+                        Время: <strong>{item.totalTime} мс</strong>
+                      </>
+                    ) : item.status === 'COMPLETED' ? (
+                      'Время: рассчитывается...'
+                    ) : (
+                      'Время: —'
+                    )}
+                  </div>
+                {isModerator && item.status === 'FORMED' && item.id != null && (
+                  <div className="request-card-actions" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      className="primary-button"
+                      disabled={mutationLoading}
+                      onClick={() => handleModerate(item.id!, 'COMPLETE')}
+                    >
+                      Завершить
+                    </button>
+                    <button
+                      type="button"
+                      className="ghost-button ghost-button--danger"
+                      disabled={mutationLoading}
+                      onClick={() => handleModerate(item.id!, 'REJECT')}
+                    >
+                      Отклонить
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
         </div>

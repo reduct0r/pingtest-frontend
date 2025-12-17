@@ -3,11 +3,12 @@ import { Outlet, useLocation, Link } from 'react-router-dom';
 import AppHeader from './AppHeader';
 import { useAppInfo } from '../context/AppInfoContext';
 import { ROUTES } from '../Routes';
+import { useAppSelector } from '../hooks/redux';
 
 const breadcrumbMap: Record<string, string> = {
   '': 'Главная',
   components: 'Компоненты',
-  requests: 'Мои заявки',
+  requests: 'Мои заявки', // Будет переопределено для модератора
   profile: 'Личный кабинет',
   login: 'Вход',
   register: 'Регистрация',
@@ -21,6 +22,7 @@ const getStoredComponentTitle = (id: string) => {
 const AppLayout: FC = () => {
   const { companyMotto } = useAppInfo();
   const location = useLocation();
+  const { user } = useAppSelector((state) => state.auth);
 
   const buildBreadcrumbs = () => {
     const cleaned = location.pathname.replace(/^\/+/, '');
@@ -35,6 +37,11 @@ const AppLayout: FC = () => {
       const prev = parts[index - 1];
       const isLast = index === parts.length - 1;
       let label = breadcrumbMap[part] ?? decodeURIComponent(part);
+      
+      // Для модератора меняем "Мои заявки" на "Все заявки"
+      if (part === 'requests' && user?.isModerator) {
+        label = 'Все заявки';
+      }
 
       if (/^\d+$/.test(part)) {
         if (prev === 'requests') {
