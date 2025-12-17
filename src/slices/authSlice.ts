@@ -6,25 +6,6 @@ import axios from 'axios';
 import { resetCatalog } from './catalogSlice';
 import { fetchCartIcon, fetchRequests, resetRequestsState } from './requestsSlice';
 
-const LAST_USERNAME_KEY = 'pingtest:last-username';
-
-const readLastUsername = () => {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-  return localStorage.getItem(LAST_USERNAME_KEY);
-};
-
-const persistLastUsername = (value: string | null) => {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  if (value) {
-    localStorage.setItem(LAST_USERNAME_KEY, value);
-  } else {
-    localStorage.removeItem(LAST_USERNAME_KEY);
-  }
-};
 
 const mapErrorMessage = (message: unknown) => {
   if (axios.isAxiosError(message)) {
@@ -55,7 +36,6 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   registrationSuccess: boolean;
-  lastUsername: string | null;
 }
 
 const initialState: AuthState = {
@@ -63,7 +43,6 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   registrationSuccess: false,
-  lastUsername: readLastUsername(),
 };
 
 export const loginUser = createAsyncThunk<UserDto, LoginDto, { rejectValue: string; dispatch: AppDispatch }>(
@@ -72,7 +51,6 @@ export const loginUser = createAsyncThunk<UserDto, LoginDto, { rejectValue: stri
     try {
       await api.auth.loginCreate(credentials);
       const profile = normalizeUser(await api.users.usersMeDetail());
-      persistLastUsername(profile.username);
       dispatch(fetchCartIcon());
       dispatch(fetchRequests());
       return profile;
@@ -85,7 +63,6 @@ export const loginUser = createAsyncThunk<UserDto, LoginDto, { rejectValue: stri
 export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>('auth/logoutUser', async (_, { rejectWithValue, dispatch }) => {
   try {
     await api.auth.logoutCreate();
-    persistLastUsername(null);
     dispatch(resetCatalog());
     dispatch(resetRequestsState());
   } catch (error) {
@@ -98,7 +75,6 @@ export const registerUser = createAsyncThunk<UserDto, UserRegistrationDto, { rej
   async (payload, { rejectWithValue }) => {
     try {
       const user = normalizeUser(await api.users.usersRegisterCreate(payload));
-      persistLastUsername(user.username);
       return user;
     } catch (error) {
       return rejectWithValue(mapErrorMessage(error));
@@ -111,7 +87,6 @@ export const bootstrapAuth = createAsyncThunk<UserDto | null, void, { rejectValu
   async (_, { rejectWithValue, dispatch }) => {
     try {
       const profile = normalizeUser(await api.users.usersMeDetail());
-      persistLastUsername(profile.username);
       dispatch(fetchCartIcon());
       dispatch(fetchRequests());
       return profile;
@@ -126,7 +101,6 @@ export const updateProfile = createAsyncThunk<UserDto, UserUpdateDto, { rejectVa
   async (dto, { rejectWithValue }) => {
     try {
       const profile = normalizeUser(await api.users.usersMeUpdate(dto));
-      persistLastUsername(profile.username);
       return profile;
     } catch (error) {
       return rejectWithValue(mapErrorMessage(error));
@@ -160,7 +134,6 @@ const authSlice = createSlice({
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
-        state.lastUsername = null;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.error = action.payload ?? 'Не удалось выйти';
@@ -173,7 +146,6 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action: PayloadAction<UserDto>) => {
         state.loading = false;
         state.registrationSuccess = true;
-        state.lastUsername = action.payload.username;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
@@ -182,7 +154,6 @@ const authSlice = createSlice({
       })
       .addCase(bootstrapAuth.fulfilled, (state, action) => {
         state.user = action.payload;
-        state.lastUsername = action.payload?.username ?? state.lastUsername;
       })
       .addCase(updateProfile.pending, (state) => {
         state.loading = true;
