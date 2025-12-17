@@ -331,6 +331,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: 'DELETE',
         ...params,
       }),
+
+    pingTimeModerateUpdate: (id: number, data: ModerateActionDto, params: RequestParams = {}) =>
+      this.request<PingTimeDto, any>({
+        path: `/api/ping-time/${id}/moderate`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
   };
 }
 

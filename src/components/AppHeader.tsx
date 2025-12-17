@@ -29,11 +29,16 @@ const AppHeader: FC = () => {
       </Link>
       <nav className="main-nav">
         <NavLink to={ROUTES.COMPONENTS}>Компоненты</NavLink>
-        {user && <NavLink to={ROUTES.REQUESTS}>Мои заявки</NavLink>}
+        {user && <NavLink to={ROUTES.REQUESTS}>{user.isModerator ? 'Все заявки' : 'Мои заявки'}</NavLink>}
         {user && <NavLink to={ROUTES.PROFILE}>Личный кабинет</NavLink>}
       </nav>
       <div className="header-actions">
-        {user ? <span className="username-chip">{user.username}</span> : null}
+        {user && (
+          <span className="username-chip">
+            {user.username}
+            {user.isModerator && <span style={{ marginLeft: '8px', color: '#1cbfff', fontSize: '12px' }}>(Модератор)</span>}
+          </span>
+        )}
         {!user && (
           <>
             <Link to={ROUTES.LOGIN} className="ghost-button">
