@@ -98,7 +98,7 @@ export const fetchRequests = createAsyncThunk<PingTimeDto[], void, { state: Root
     try {
       const state = getState() as RootState;
       const { filters, cartInfo } = state.requests;
-      const query: { status?: PingTimeStatus | string; fromDate?: string | null; toDate?: string | null } = {};
+      const query: { status?: PingTimeStatus | string; fromDate?: string; toDate?: string } = {};
       if (filters.status !== 'ALL') {
         query.status = filters.status;
       }
@@ -111,7 +111,8 @@ export const fetchRequests = createAsyncThunk<PingTimeDto[], void, { state: Root
         query.toDate = toDate;
       }
 
-      const requestQuery = Object.keys(query).length > 0 ? query : undefined;
+      const requestQuery: { status?: PingTimeStatus | string; fromDate?: string; toDate?: string } | undefined = 
+        Object.keys(query).length > 0 ? query : undefined;
 
       const list = await api.pingTime.pingTimeList(requestQuery);
       let requestsToReturn = list;
