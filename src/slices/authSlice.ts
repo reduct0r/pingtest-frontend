@@ -143,7 +143,7 @@ const authSlice = createSlice({
         state.error = null;
         state.registrationSuccess = false;
       })
-      .addCase(registerUser.fulfilled, (state, action: PayloadAction<UserDto>) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.loading = false;
         state.registrationSuccess = true;
       })

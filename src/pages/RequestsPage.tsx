@@ -23,7 +23,7 @@ const RequestsPage: FC = () => {
   const isDateRangeValid =
     !filters.startDate || !filters.endDate || filters.startDate <= filters.endDate;
   const isModerator = Boolean(user?.isModerator);
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Устанавливаем сегодняшние даты при первом заходе на страницу, если они не установлены
   useEffect(() => {
