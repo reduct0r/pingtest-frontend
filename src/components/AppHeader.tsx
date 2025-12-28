@@ -30,6 +30,7 @@ const AppHeader: FC = () => {
       <nav className="main-nav">
         <NavLink to={ROUTES.COMPONENTS}>Компоненты</NavLink>
         {user && <NavLink to={ROUTES.REQUESTS}>{user.isModerator ? 'Все заявки' : 'Мои заявки'}</NavLink>}
+        {user?.isModerator && <NavLink to={ROUTES.COMPONENTS_MANAGEMENT}>Управление услугами</NavLink>}
         {user && <NavLink to={ROUTES.PROFILE}>Личный кабинет</NavLink>}
       </nav>
       <div className="header-actions">

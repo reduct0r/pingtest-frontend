@@ -7,6 +7,9 @@ export const ROUTES = {
   REQUESTS: '/requests',
   REQUEST_DETAIL: '/requests/:id',
   PROFILE: '/profile',
+  COMPONENTS_MANAGEMENT: '/components-management',
+  FORBIDDEN: '/403',
+  NOT_FOUND: '/404',
 } as const;
 
 export type RouteKeyType = keyof typeof ROUTES;
@@ -20,4 +23,7 @@ export const ROUTE_LABELS: Record<RouteKeyType, string> = {
   REQUESTS: 'Заявки',
   REQUEST_DETAIL: 'Детали заявки',
   PROFILE: 'Личный кабинет',
+  COMPONENTS_MANAGEMENT: 'Управление услугами',
+  FORBIDDEN: 'Доступ запрещен',
+  NOT_FOUND: 'Страница не найдена',
 };

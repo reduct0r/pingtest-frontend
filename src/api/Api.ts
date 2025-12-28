@@ -279,6 +279,31 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: 'POST',
         ...params,
       }),
+
+    serverComponentsCreate: (data: ComponentDto, params: RequestParams = {}) =>
+      this.request<ComponentDto, any>({
+        path: `/api/server-components`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    serverComponentsUpdate: (id: number, data: ComponentDto, params: RequestParams = {}) =>
+      this.request<ComponentDto, any>({
+        path: `/api/server-components/${id}`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    serverComponentsDelete: (id: number, params: RequestParams = {}) =>
+      this.request<MessageResponse, any>({
+        path: `/api/server-components/${id}`,
+        method: 'DELETE',
+        ...params,
+      }),
   };
 
   pingTime = {
