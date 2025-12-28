@@ -1,32 +1,59 @@
 import type { FC } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/styles.css';
-import type { Component } from '../modules/mock';
+import type { ComponentDto } from '../api/Api';
 
 interface Props {
-  component: Component;
+  component: ComponentDto;
+  canAdd?: boolean;
+  isAdding?: boolean;
+  onAdd?: (componentId: number) => void;
 }
 
-const CardComponent: FC<Props> = ({ component }) => {
+const CardComponent: FC<Props> = ({ component, canAdd = false, onAdd, isAdding }) => {
+  const base = import.meta.env.BASE_URL;
   return (
     <div className="card-container">
-      <Link to={`/components/${component.id}`} className="card-link" style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <div className="card-content-container" style={{ maxWidth: '298px', boxSizing: 'border-box' }}>
+      <div className="card-content-container">
+        <Link to={`/components/${component.id}`} className="card-body-link" state={{ breadcrumb: component.title }}>
           <img
-            src={component.imageUrl || '/placeholder_142x142.png'}
-            alt="placeholder"
+            src={component.imageUrl || `${base}placeholder_142x142.png`}
+            alt={component.title}
             className="card-content-container-img"
-            onError={(e) => { e.currentTarget.src = '/placeholder_142x142.png'; }}
+            onError={(e) => {
+              e.currentTarget.src = `${base}placeholder_142x142.png`;
+            }}
           />
           <p className="card-title">{component.title}</p>
           <p className="description">{component.description}</p>
+        </Link>
+        <div className="time-row">
           <div className="time">
-            <img src="ping_icon.svg" alt="ping icon" onError={(e) => { e.currentTarget.src = '/placeholder_23x23.png'; }} />
+            <img
+              src={`${base}ping_icon.svg`}
+              alt="ping icon"
+              onError={(e) => {
+                e.currentTarget.src = `${base}placeholder_23x23.png`;
+              }}
+            />
             <span>{component.time} мс</span>
-            {/* <AddButton componentId={component.id} /> */}
           </div>
+          {canAdd && component.id && (
+            <button
+              type="button"
+              className="primary-button primary-button--ghost add-inline"
+              disabled={isAdding}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onAdd?.(component.id!);
+              }}
+            >
+              {isAdding ? '...' : 'Добавить'}
+            </button>
+          )}
         </div>
-      </Link>
+      </div>
     </div>
   );
 };

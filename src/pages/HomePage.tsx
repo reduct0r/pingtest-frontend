@@ -1,15 +1,17 @@
 import type { FC } from 'react';
 import { useMemo } from 'react';
-import Breadcrumbs from '../components/Breadcrumbs';
 import '../styles/styles.css';
+import { useAppInfo } from '../context/AppInfoContext';
 
 const HomePage: FC = () => {
+  const base = import.meta.env.BASE_URL;
+  const { appName } = useAppInfo();
   const images = [
-    '/line/balancer_line.png',
-    '/line/cache_line.png',
-    '/line/server_line.png',
-    '/line/server_settings.png',
-    '/line/speed_front.png',
+    `${base}line/balancer_line.png`,
+    `${base}line/cache_line.png`,
+    `${base}line/server_line.png`,
+    `${base}line/server_settings.png`,
+    `${base}line/speed_front.png`,
   ];
 
   const shuffledImages = useMemo(() => {
@@ -20,13 +22,14 @@ const HomePage: FC = () => {
 
   return (
     <div className="page-wrapper">
-      <Breadcrumbs crumbs={[]} />
       <div className="main-plate">
         <div className="home-content">
           <div className="left-column">
             <div className="section">
               <h2 className="section-title">О компании</h2>
-              <p className="section-text">PINGTEST — ведущая компания в области анализа и оптимизации производительности веб-приложений. Мы помогаем бизнесу снижать время отклика и повышать пользовательский опыт.</p>
+              <p className="section-text">
+                {appName} — сервис расчета времени отклика серверных компонентов. Мы предоставляем инструменты для расчета времени отклика серверных компонентов
+              </p>
             </div>
             <div className="section">
               <h2 className="section-title">Наши услуги</h2>
@@ -38,11 +41,7 @@ const HomePage: FC = () => {
             </div>
           </div>
           <div className="right-image">
-            <img 
-              src="/hero_image.png" 
-              alt="PINGTEST Optimization" 
-              className="hero-image"
-            />
+            <img src={`${base}hero_image.png`} alt="PINGTEST Optimization" className="hero-image" />
           </div>
         </div>
         <div className="ticker-container">
@@ -56,7 +55,6 @@ const HomePage: FC = () => {
           </div>
         </div>
       </div>
-      <div className="footer">Reduct0r 2025</div>
     </div>
   );
 };

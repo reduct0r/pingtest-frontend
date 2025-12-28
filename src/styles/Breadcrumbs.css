@@ -18,3 +18,11 @@
 .breadcrumbs li:last-child {
   color: #ffffff;
 }
+
+@media (max-width: 768px) {
+  .breadcrumbs {
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px;
+  }
+}
