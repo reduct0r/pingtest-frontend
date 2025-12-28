@@ -9,6 +9,7 @@ import {
   formRequest,
   deleteRequest,
   updateLoadCoefficient,
+  moderateRequest,
 } from '../slices/requestsSlice';
 import Loader from '../components/Loader';
 import { ROUTES } from '../Routes';
@@ -19,8 +20,9 @@ const RequestDetailPage: FC = () => {
   const requestId = Number.isFinite(parsedId) ? parsedId : null;
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { currentRequest, loadingCurrent, error } = useAppSelector((state) => state.requests);
+  const { currentRequest, loadingCurrent, error, mutationLoading } = useAppSelector((state) => state.requests);
   const { user } = useAppSelector((state) => state.auth);
+  const isModerator = Boolean(user?.isModerator);
   const [coefficient, setCoefficient] = useState<number>(1);
   const [itemQuantities, setItemQuantities] = useState<Record<number, number>>({});
 
@@ -155,7 +157,17 @@ const RequestDetailPage: FC = () => {
     void dispatch(fetchRequestById(currentRequest.id));
   };
 
+  const handleModerate = async (action: 'COMPLETE' | 'REJECT') => {
+    if (!currentRequest.id) return;
+    const result = await dispatch(moderateRequest({ requestId: currentRequest.id, action }));
+    if (moderateRequest.fulfilled.match(result)) {
+      // Обновляем данные заявки после модерации
+      void dispatch(fetchRequestById(currentRequest.id));
+    }
+  };
+
   const showTotalTimeValue = currentRequest.status === 'COMPLETED' && currentRequest.totalTime != null;
+  const isFormed = currentRequest.status === 'FORMED';
 
   return (
     <div className="ping-wrapper">
@@ -255,6 +267,26 @@ const RequestDetailPage: FC = () => {
             </button>
             <button type="button" className="ghost-button ghost-button--danger" onClick={handleDeleteRequest}>
               Очистить черновик
+            </button>
+          </div>
+        )}
+        {isModerator && isFormed && currentRequest.id && (
+          <div className="ping-actions" style={{ marginTop: '20px' }}>
+            <button
+              type="button"
+              className="primary-button"
+              disabled={mutationLoading}
+              onClick={() => handleModerate('COMPLETE')}
+            >
+              Завершить
+            </button>
+            <button
+              type="button"
+              className="ghost-button ghost-button--danger"
+              disabled={mutationLoading}
+              onClick={() => handleModerate('REJECT')}
+            >
+              Отклонить
             </button>
           </div>
         )}

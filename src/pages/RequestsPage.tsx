@@ -2,7 +2,7 @@ import type { FC, ChangeEvent } from 'react';
 import { useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { fetchRequests, setFilters, moderateRequest } from '../slices/requestsSlice';
+import { fetchRequests, setFilters, moderateRequest, setPage } from '../slices/requestsSlice';
 import Loader from '../components/Loader';
 import { ROUTES } from '../Routes';
 
@@ -19,7 +19,7 @@ const RequestsPage: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
-  const { requests, loadingList, filters, error, mutationLoading } = useAppSelector((state) => state.requests);
+  const { requests, loadingList, filters, error, mutationLoading, paginatedData, currentPage } = useAppSelector((state) => state.requests);
   const isDateRangeValid =
     !filters.startDate || !filters.endDate || filters.startDate <= filters.endDate;
   const isModerator = Boolean(user?.isModerator);
@@ -33,39 +33,44 @@ const RequestsPage: FC = () => {
     }
   }, []); // Только при монтировании компонента
 
-  // Short polling только для модераторов
+  // Первый запрос при изменении фильтров
   useEffect(() => {
     if (user && isDateRangeValid) {
-      // Первый запрос сразу
       dispatch(fetchRequests());
-      
-      // Short polling только для модераторов (каждые 3 секунды)
-      if (isModerator) {
-        pollingIntervalRef.current = setInterval(() => {
-          dispatch(fetchRequests());
-        }, 3000);
-
-        return () => {
-          if (pollingIntervalRef.current) {
-            clearInterval(pollingIntervalRef.current);
-          }
-        };
-      }
     }
-  }, [dispatch, user, isModerator, filters.status, filters.startDate, filters.endDate, filters.creatorFilter, isDateRangeValid]);
+  }, [dispatch, user, isModerator, filters.status, filters.startDate, filters.endDate, filters.creatorFilter, isDateRangeValid, currentPage]);
+
+  // Short polling только для модераторов (каждые 10 секунд)
+  useEffect(() => {
+    if (user && isModerator && isDateRangeValid) {
+      pollingIntervalRef.current = setInterval(() => {
+        dispatch(fetchRequests());
+      }, 10000);
+
+      return () => {
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+        }
+      };
+    }
+  }, [dispatch, user, isModerator, isDateRangeValid]);
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     dispatch(setFilters({ status: event.target.value as typeof filters.status }));
+    dispatch(setPage(0));
   };
 
   const handleDateChange =
     (field: 'startDate' | 'endDate') => (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value || null;
       dispatch(setFilters({ [field]: value }));
+      dispatch(setPage(0));
     };
 
   const handleResetDates = () => {
     dispatch(setFilters({ startDate: null, endDate: null }));
+    dispatch(setPage(0));
   };
 
   const handleCreatorFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -74,6 +79,33 @@ const RequestsPage: FC = () => {
 
   const handleModerate = async (requestId: number, action: 'COMPLETE' | 'REJECT') => {
     await dispatch(moderateRequest({ requestId, action }));
+  };
+
+  const handlePageChange = (newPage: number) => {
+    dispatch(setPage(newPage));
+  };
+
+  // Генерация номеров страниц для отображения
+  const getPageNumbers = () => {
+    if (!paginatedData) return [];
+    const totalPages = paginatedData.totalPages;
+    const current = paginatedData.currentPage;
+    const pages: (number | string)[] = [];
+    
+    if (totalPages <= 7) {
+      for (let i = 0; i < totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(0);
+      if (current > 2) pages.push('...');
+      for (let i = Math.max(1, current - 1); i <= Math.min(totalPages - 2, current + 1); i++) {
+        pages.push(i);
+      }
+      if (current < totalPages - 3) pages.push('...');
+      pages.push(totalPages - 1);
+    }
+    return pages;
   };
 
   if (!user) {
@@ -223,6 +255,42 @@ const RequestsPage: FC = () => {
                 )}
               </div>
             ))}
+        </div>
+      )}
+      {paginatedData && paginatedData.totalPages > 1 && (
+        <div className="pagination-container" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            className="ghost-button"
+            disabled={!paginatedData.hasPrevious || loadingList}
+            onClick={() => handlePageChange(currentPage! - 1)}
+          >
+            Назад
+          </button>
+          {getPageNumbers().map((pageNum, idx) => (
+            pageNum === '...' ? (
+              <span key={`ellipsis-${idx}`} style={{ color: '#fff', padding: '0 5px' }}>...</span>
+            ) : (
+              <button
+                key={pageNum}
+                type="button"
+                className={pageNum === currentPage ? 'primary-button' : 'ghost-button'}
+                disabled={loadingList}
+                onClick={() => handlePageChange(pageNum as number)}
+                style={{ minWidth: '40px' }}
+              >
+                {(pageNum as number) + 1}
+              </button>
+            )
+          ))}
+          <button
+            type="button"
+            className="ghost-button"
+            disabled={!paginatedData.hasNext || loadingList}
+            onClick={() => handlePageChange(currentPage! + 1)}
+          >
+            Вперед
+          </button>
         </div>
       )}
     </section>
