@@ -9,6 +9,7 @@ import RequestsPage from './pages/RequestsPage';
 import RequestDetailPage from './pages/RequestDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import ComponentsManagementPage from './pages/ComponentsManagementPage';
+import ComponentEditPage from './pages/ComponentEditPage';
 import ForbiddenPage from './pages/ForbiddenPage';
 import NotFoundPage from './pages/NotFoundPage';
 import { ROUTES } from './Routes';
@@ -30,6 +31,8 @@ const App: FC = () => {
           <Route path={ROUTES.REQUEST_DETAIL} element={<RequestDetailPage />} />
           <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
           <Route path={ROUTES.COMPONENTS_MANAGEMENT} element={<ComponentsManagementPage />} />
+          <Route path={ROUTES.COMPONENT_EDIT} element={<ComponentEditPage />} />
+          <Route path={ROUTES.COMPONENT_CREATE} element={<ComponentEditPage />} />
           <Route path={ROUTES.FORBIDDEN} element={<ForbiddenPage />} />
           <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
           <Route path="*" element={<NotFoundPage />} />
