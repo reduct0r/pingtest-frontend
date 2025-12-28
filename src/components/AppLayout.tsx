@@ -12,6 +12,7 @@ const breadcrumbMap: Record<string, string> = {
   profile: 'Личный кабинет',
   login: 'Вход',
   register: 'Регистрация',
+  'components-management': 'Управление услугами',
 };
 
 const getStoredComponentTitle = (id: string) => {
