@@ -8,6 +8,8 @@ export const ROUTES = {
   REQUEST_DETAIL: '/requests/:id',
   PROFILE: '/profile',
   COMPONENTS_MANAGEMENT: '/components-management',
+  COMPONENT_EDIT: '/components-management/:id',
+  COMPONENT_CREATE: '/components-management/new',
   FORBIDDEN: '/403',
   NOT_FOUND: '/404',
 } as const;
@@ -23,7 +25,9 @@ export const ROUTE_LABELS: Record<RouteKeyType, string> = {
   REQUESTS: 'Заявки',
   REQUEST_DETAIL: 'Детали заявки',
   PROFILE: 'Личный кабинет',
-  COMPONENTS_MANAGEMENT: 'Управление услугами',
+  COMPONENTS_MANAGEMENT: 'Управление серверными компонентами',
+  COMPONENT_EDIT: 'Редактирование серверного компонента',
+  COMPONENT_CREATE: 'Создание серверного компонента',
   FORBIDDEN: 'Доступ запрещен',
   NOT_FOUND: 'Страница не найдена',
 };

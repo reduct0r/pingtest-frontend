@@ -12,7 +12,7 @@ const breadcrumbMap: Record<string, string> = {
   profile: 'Личный кабинет',
   login: 'Вход',
   register: 'Регистрация',
-  'components-management': 'Управление услугами',
+  'components-management': 'Управление серверными компонентами',
 };
 
 const getStoredComponentTitle = (id: string) => {
@@ -52,6 +52,12 @@ const AppLayout: FC = () => {
             label = state.breadcrumb;
           } else {
             label = getStoredComponentTitle(part) ?? `Компонент ${part}`;
+          }
+        } else if (prev === 'components-management') {
+          if (part === 'new') {
+            label = 'Создание серверного компонента';
+          } else {
+            label = `Редактирование серверного компонента ${part}`;
           }
         }
       }
