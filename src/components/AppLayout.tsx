@@ -39,8 +39,8 @@ const AppLayout: FC = () => {
       let label = breadcrumbMap[part] ?? decodeURIComponent(part);
       
       // Для модератора меняем "Мои заявки" на "Все заявки"
-      if (part === 'requests' && user?.isModerator) {
-        label = 'Все заявки';
+      if (part === 'requests') {
+        label = Boolean(user?.isModerator) ? 'Все заявки' : 'Мои заявки';
       }
 
       if (/^\d+$/.test(part)) {

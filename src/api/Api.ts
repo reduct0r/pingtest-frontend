@@ -78,6 +78,17 @@ export interface TimePingIconDto {
   itemCount?: number;
 }
 
+export interface PaginatedResponseDto<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  queryTimeMs?: number | null;
+}
+
 export interface LoginDto {
   username: string;
   password: string;
@@ -278,9 +289,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
 
-    pingTimeList: (query?: { status?: PingTimeStatus | string; fromDate?: string; toDate?: string }, params: RequestParams = {}) =>
-      this.request<PingTimeDto[], any>({
+    pingTimeList: (
+      query?: {
+        status?: PingTimeStatus | string;
+        fromDate?: string;
+        toDate?: string;
+        page?: number;
+        size?: number;
+        sortBy?: string;
+        sortDir?: string;
+        useIndex?: boolean;
+      },
+      params: RequestParams = {}
+    ) =>
+      this.request<PingTimeDto[] | PaginatedResponseDto<PingTimeDto>, any>({
         path: `/api/ping-time`,
+        method: 'GET',
+        query,
+        ...params,
+      }),
+
+    pingTimeListPaginated: (
+      query?: {
+        status?: PingTimeStatus | string;
+        fromDate?: string;
+        toDate?: string;
+        page?: number;
+        size?: number;
+        sortBy?: string;
+        sortDir?: string;
+      },
+      params: RequestParams = {}
+    ) =>
+      this.request<PaginatedResponseDto<PingTimeDto>, any>({
+        path: `/api/ping-time/paginated`,
         method: 'GET',
         query,
         ...params,
