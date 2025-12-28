@@ -1,5 +1,5 @@
 import type { FC, ChangeEvent } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchRequests, setFilters, moderateRequest, setPage } from '../slices/requestsSlice';
@@ -26,6 +26,8 @@ const RequestsPage: FC = () => {
   const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Устанавливаем сегодняшние даты при первом заходе на страницу, если они не установлены
+  const [hasInitialLoad, setHasInitialLoad] = useState(false);
+  
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
     if (!filters.startDate || !filters.endDate) {
@@ -33,12 +35,25 @@ const RequestsPage: FC = () => {
     }
   }, []); // Только при монтировании компонента
 
-  // Первый запрос при изменении фильтров
+  // Выполняем первый запрос при загрузке страницы (только один раз)
   useEffect(() => {
-    if (user && isDateRangeValid) {
+    if (user && isDateRangeValid && !hasInitialLoad) {
       dispatch(fetchRequests());
+      setHasInitialLoad(true);
     }
-  }, [dispatch, user, isModerator, filters.status, filters.startDate, filters.endDate, filters.creatorFilter, isDateRangeValid, currentPage]);
+  }, [dispatch, user, isDateRangeValid, hasInitialLoad]);
+
+  // Запрос при изменении страницы пагинации (но не при первом рендере и не при сбросе на 0)
+  const prevPageRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (user && isDateRangeValid && currentPage !== undefined && hasInitialLoad) {
+      // Запрос только если страница действительно изменилась (не при первом рендере)
+      if (prevPageRef.current !== undefined && prevPageRef.current !== currentPage) {
+        dispatch(fetchRequests());
+      }
+      prevPageRef.current = currentPage;
+    }
+  }, [dispatch, user, isDateRangeValid, currentPage, hasInitialLoad]);
 
   // Short polling только для модераторов (каждые 10 секунд)
   useEffect(() => {
@@ -58,23 +73,32 @@ const RequestsPage: FC = () => {
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     dispatch(setFilters({ status: event.target.value as typeof filters.status }));
-    dispatch(setPage(0));
+    // Не отправляем запрос автоматически - только при нажатии "Поиск"
   };
 
   const handleDateChange =
     (field: 'startDate' | 'endDate') => (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value || null;
       dispatch(setFilters({ [field]: value }));
-      dispatch(setPage(0));
+      // Не отправляем запрос автоматически - только при нажатии "Поиск"
     };
 
   const handleResetDates = () => {
     dispatch(setFilters({ startDate: null, endDate: null }));
-    dispatch(setPage(0));
+    // Не отправляем запрос автоматически - только при нажатии "Поиск"
   };
 
   const handleCreatorFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
     dispatch(setFilters({ creatorFilter: event.target.value || null }));
+    // Не отправляем запрос автоматически - только при нажатии "Поиск"
+  };
+
+  const handleSearch = () => {
+    // Сбрасываем на первую страницу и выполняем поиск
+    dispatch(setPage(0));
+    if (user && isDateRangeValid) {
+      dispatch(fetchRequests());
+    }
   };
 
   const handleModerate = async (requestId: number, action: 'COMPLETE' | 'REJECT') => {
@@ -156,7 +180,7 @@ const RequestsPage: FC = () => {
           </label>
           {(filters.startDate || filters.endDate) && (
             <button type="button" className="ghost-button" onClick={handleResetDates}>
-              Сбросить
+              Сбросить даты
             </button>
           )}
           <label>
@@ -177,9 +201,23 @@ const RequestsPage: FC = () => {
                 placeholder="Фильтр по имени..."
                 value={filters.creatorFilter ?? ''}
                 onChange={handleCreatorFilterChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearch();
+                  }
+                }}
               />
             </label>
           )}
+          <button
+            type="button"
+            className="primary-button"
+            onClick={handleSearch}
+            disabled={!isDateRangeValid || loadingList}
+            style={{ marginLeft: '10px', minWidth: '100px' }}
+          >
+            {loadingList ? 'Поиск...' : 'Поиск'}
+          </button>
         </div>
         {!isDateRangeValid && (
           <p className="form-error">Дата "от" не может быть позже даты "до".</p>
