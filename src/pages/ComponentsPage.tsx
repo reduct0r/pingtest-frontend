@@ -1,70 +1,78 @@
 import type { FC } from 'react';
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';  // Добавлен для Link на корзину
-import Breadcrumbs from '../components/Breadcrumbs';
+import { useEffect, useState } from 'react';
 import CardComponent from '../components/CardComponent';
-import { getComponents } from '../modules/api';
-import { ROUTE_LABELS } from '../Routes';
+import { ROUTES } from '../Routes';
 import '../styles/styles.css';
-import type { Component } from '../modules/mock';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { fetchComponents, setSearchValue } from '../slices/catalogSlice';
+import { addComponentToDraft } from '../slices/requestsSlice';
+import Loader from '../components/Loader';
+import { useNavigate } from 'react-router-dom';
 
 const ComponentsListPage: FC = () => {
-  const [inputValue, setInputValue] = useState('');
-  const [appliedFilter, setAppliedFilter] = useState('');
-  const [components, setComponents] = useState<Component[]>([]);
-  const [loading, setLoading] = useState(false);
+  const base = import.meta.env.BASE_URL;
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { items, loading, error, searchValue } = useAppSelector((state) => state.catalog);
+  const { user } = useAppSelector((state) => state.auth);
+  const { mutationLoading, cartInfo } = useAppSelector((state) => state.requests);
+  const [inputValue, setInputValue] = useState(searchValue);
 
   useEffect(() => {
-    setLoading(true);
-    getComponents(appliedFilter).then((data) => {
-      setComponents(data);
-      setLoading(false);
-    });
-  }, [appliedFilter]);
+    dispatch(fetchComponents());
+  }, [dispatch, searchValue]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setAppliedFilter(inputValue);
+  useEffect(() => {
+    setInputValue(searchValue);
+  }, [searchValue]);
+
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    dispatch(setSearchValue(inputValue));
   };
 
-  // Захардкоженые значения
-  const draftTimePingId = 1;  // ID для ссылки
-  const requestSize = 3;  //  кол-во элементов
+  const handleAdd = (componentId: number) => {
+    if (!user) return;
+    dispatch(addComponentToDraft(componentId));
+  };
 
   return (
     <div className="page-wrapper">
       <div className="main-plate">
-        <Breadcrumbs crumbs={[{ label: ROUTE_LABELS.COMPONENTS }]} />
         <div className="welcome-title">Компоненты</div>
         <div className="search-holder">
           <form className="search-bar" onSubmit={handleSearch}>
-            <input
-              type="text"
-              placeholder="Поиск серверных компонентов"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-            />
+            <input type="text" placeholder="Поиск серверных компонентов" value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
             <button type="submit" className="search-button">
-              <img src="/search_icon.svg" alt="search" />
+              <img src={`${base}search_icon.svg`} alt="search" />
             </button>
           </form>
         </div>
         <div className="container-plate">
+          {error && <p className="form-error">{error}</p>}
+          {loading ? (
+            <Loader />
+          ) : (
           <div className="main-cards-container">
-            {loading ? <p>Загрузка...</p> : components.map((comp) => (
+              {items.map((comp) => (
               <div key={comp.id} style={{ flex: '0 0 300px', margin: '0 auto' }}>
-                <CardComponent component={comp} />
+                  <CardComponent component={comp} canAdd={Boolean(user)} onAdd={handleAdd} isAdding={mutationLoading} />
               </div>
             ))}
           </div>
+          )}
         </div>
       </div>
-      <div className="footer">Reduct0r 2025</div>
-      {draftTimePingId !== null && requestSize > 0 && (
-        <div className="request-icon">
-          <img src="/cart.png" alt="Корзина" onError={(e) => { e.currentTarget.src = '/placeholder_85x89.png'; }} />
-          <span className="request-badge">{requestSize}</span>
-        </div>
+      {user && (
+        <button
+          type="button"
+          className={`request-icon ${!cartInfo?.draftId || !cartInfo?.itemCount ? 'request-icon--disabled' : ''}`}
+          onClick={() => cartInfo?.draftId && cartInfo?.itemCount && navigate(`${ROUTES.REQUESTS}/${cartInfo.draftId}`)}
+          disabled={!cartInfo?.draftId || !cartInfo?.itemCount}
+        >
+          <img src={`${base}cart.png`} alt="Корзина" onError={(e) => (e.currentTarget.src = `${base}placeholder_85x89.png`)} />
+          {cartInfo?.itemCount ? <span className="request-badge">{cartInfo.itemCount}</span> : null}
+        </button>
       )}
     </div>
   );
